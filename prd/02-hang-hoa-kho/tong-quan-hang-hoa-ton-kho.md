@@ -139,6 +139,11 @@ Nghiệp vụ tác động tồn:
 
 Mỗi nghiệp vụ là 1 loại **phiếu (Voucher/Document)** với cấu trúc tương tự: Header (mã, ngày, CN, người tạo, trạng thái, ghi chú) + Lines (SP, SL, giá, vị trí).
 
+> **Deep dive cho 3 nghiệp vụ chính:**
+> - Nhập hàng → [`nhap-hang-deep-dive.md`](./nhap-hang-deep-dive.md)
+> - Trả hàng (bán + nhập) → [`tra-hang-deep-dive.md`](./tra-hang-deep-dive.md)
+> - Bán hàng (góc tồn kho) → [`ban-hang-deep-dive.md`](./ban-hang-deep-dive.md)
+
 #### C1. Phiếu Chuyển hàng (Stock Transfer)
 - **Vai trò:** Chuyển hàng giữa các Chi nhánh
 - **Trạng thái:** Phiếu tạm → Đang chuyển → Đã nhận
