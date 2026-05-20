@@ -47,6 +47,47 @@
 
 ---
 
+### 04 — Sổ quỹ (Cash Flow)
+
+| File | Mô tả |
+|------|-------|
+| [tong-quan-so-quy.md](./04-so-quy/tong-quan-so-quy.md) | Tổng quan module Sổ quỹ: 4 loại quỹ (Tiền mặt/NH/Ví/Tổng), 2 loại chứng từ (Phiếu thu/Phiếu chi), prefix mã (TTHD/TTDH/TTTH/CNH), state machine, flag "Hạch toán KQKD" tách dòng tiền với P&L, liên thông 6 module khác. 14 pain + Top 5 đột phá (Bank Reconciliation, Receipt OCR, Cash Flow Forecast, P&L Dashboard, Approval Workflow). |
+
+---
+
+### 05 — Khách hàng (Customer)
+
+| File | Mô tả |
+|------|-------|
+| [tong-quan-khach-hang.md](./05-khach-hang/tong-quan-khach-hang.md) | Tổng quan module Khách hàng: schema Customer với identity + contact + sales aggregates + HĐĐT info (MST/CCCD/Hộ chiếu/Bank), 5 tab chi tiết (Thông tin / Địa chỉ nhận / Lịch sử bán-trả / Nợ cần thu / Tích điểm), filter "Ngày giao dịch cuối" cho churn detection, bulk message 4 kênh (ZNS/SMS/Email/Zalo OA). 23 pain + Top 5 đột phá (RFM Auto-Group, Customer 360 Unified, Churn AI, B2B Account Mode, Credit Limit + Auto Reminder). |
+| [khach-hang-deep-dive.md](./05-khach-hang/khach-hang-deep-dive.md) | Deep dive THUẦN Customer (loại trừ Coupon/Voucher): schema 4 layer (Identity + Contact + Sales aggregates + HĐĐT), 5 tab inline + AR toolbox 5 actions, **rule engine Nhóm KH 12 trường điều kiện** với 3 mode + auto-execute (đủ build RFM), lifecycle derived từ lastTransactionAt. 29 pain chia 7 nhóm + Top 5 đột phá thuần Customer (Dedup phone, AR Aging + Credit Limit, Advanced Rule Engine OR/RFM preset, Lifecycle Stage, B2B Account multi-contact). |
+
+---
+
+### 06 — Đặt hàng / Đơn hàng (Customer Order)
+
+| File | Mô tả |
+|------|-------|
+| [don-hang-deep-dive.md](./06-don-hang/don-hang-deep-dive.md) | Deep dive Đặt hàng (DH######): soft commitment layer giữa "ý định mua" và "hóa đơn". Schema 11 cột giá per line (4 trường × trước/sau thuế), shipping block với carrier integration (Grab/GHN/Viettel/J&T với badge KiotViet), fulfillment tracking "1/0". State machine 4-5 trạng thái, filter "Thời gian giao hàng" có **Ngày mai/Tuần sau/Quý sau** (future-dated unique), đồng bộ kênh online (Shopee/TikTok/Lazada/Tiki/FB/Zalo), Gộp đơn, auto-Trả hàng khi chuyển hoàn. 19 pain + Top 5 đột phá (Smart Carrier Routing, Multi-shipment Fulfillment, Order Confirmation + Auto ZNS, Promo Stacking Engine, Webhook realtime sync). |
+
+---
+
+### 07 — Hóa đơn (Invoices)
+
+| File | Mô tả |
+|------|-------|
+| [hoa-don-deep-dive.md](./07-hoa-don/hoa-don-deep-dive.md) | Deep dive Hóa đơn (HD######) — trung tâm 7 luồng dữ liệu. Schema multi-rate VAT (0/5/8/10%) trên 1 HĐ, **3 state machine song song** (HD status 4 trạng thái + Shipping status 7 trạng thái + HĐĐT status 2 enum × 10 states), 2 tab (Thông tin + Lịch sử giao hàng audit log), 8 actions inline (Hủy/Sao chép/Sửa/Trả hàng/In/Tạo QR thu nợ). KShip first-party carrier với OTP + cấn trừ cước. Workflow HĐĐT đầy đủ (TT78/2021): phát hành → CQT → điều chỉnh/thay thế. 24 pain + Top 5 đột phá (HĐ Versioning, Inline HĐĐT workflow, Smart Carrier Quote + POD, Bulk HĐĐT publish + auto-fix, Profit Insight + AI upsell). |
+
+---
+
+### 08 — Đặt hàng nhập (Purchase Order)
+
+| File | Mô tả |
+|------|-------|
+| [dat-hang-nhap-deep-dive.md](./08-dat-hang-nhap/dat-hang-nhap-deep-dive.md) | Deep dive Đặt hàng nhập (DHN######) — **thuần nghiệp vụ**, không code/schema. Cầu nối cam kết shop ↔ NCC, không tác động tồn vật lý. 4 trạng thái workflow (Phiếu tạm → Đã xác nhận NCC → Nhập một phần → Hoàn thành). Mạnh: partial fulfillment (1 DHN qua N PN), cột "Số ngày chờ" cảnh báo NCC chậm, "Ngày nhập dự kiến" cho forecast, VAT per line, "Người nhận đặt" cho KAM thu mua, **"Đặt và gửi email" 1-click**, **tạo NCC inline**, **phím tắt F3/F8**, **tách 2 loại chi phí (NCC vs bên thứ 3)**, **setting "Giá nhập là giá vốn" per-phiếu**. 19 pain + Top 5 đột phá (Smart Reorder AI, 3-way Match + Vendor Scorecard, NCC Self-service Portal, PO Approval Workflow, Cash Flow Integration). |
+
+---
+
 ## Map nhanh: pain → tài liệu
 
 | Bạn muốn tìm hiểu về... | Xem tài liệu |
@@ -63,3 +104,8 @@
 | Bán hàng tác động tồn kho, validation, cost snapshot | `02-hang-hoa-kho/ban-hang-deep-dive.md` |
 | Database schema 45 bảng | `03-kien-truc-ky-thuat/database-design.md` |
 | Khi nào dùng Postgres vs MongoDB | `03-kien-truc-ky-thuat/sql-vs-mongodb.md` |
+| Sổ quỹ, phiếu thu/chi, dòng tiền, P&L flag | `04-so-quy/tong-quan-so-quy.md` |
+| Khách hàng, công nợ AR, loyalty, segmentation | `05-khach-hang/tong-quan-khach-hang.md` |
+| Đặt hàng, fulfillment, carrier integration, gộp đơn | `06-don-hang/don-hang-deep-dive.md` |
+| Hóa đơn, HĐĐT compliance, multi-rate VAT, KShip, QR thu nợ | `07-hoa-don/hoa-don-deep-dive.md` |
+| Đặt hàng nhập, PO workflow, NCC, partial fulfillment, lead time | `08-dat-hang-nhap/dat-hang-nhap-deep-dive.md` |
