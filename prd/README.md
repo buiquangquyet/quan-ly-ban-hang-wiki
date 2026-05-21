@@ -68,7 +68,7 @@
 
 | File | Mô tả |
 |------|-------|
-| [don-hang-deep-dive.md](./06-don-hang/don-hang-deep-dive.md) | Deep dive Đặt hàng (DH######): soft commitment layer giữa "ý định mua" và "hóa đơn". Schema 11 cột giá per line (4 trường × trước/sau thuế), shipping block với carrier integration (Grab/GHN/Viettel/J&T với badge KiotViet), fulfillment tracking "1/0". State machine 4-5 trạng thái, filter "Thời gian giao hàng" có **Ngày mai/Tuần sau/Quý sau** (future-dated unique), đồng bộ kênh online (Shopee/TikTok/Lazada/Tiki/FB/Zalo), Gộp đơn, auto-Trả hàng khi chuyển hoàn. 19 pain + Top 5 đột phá (Smart Carrier Routing, Multi-shipment Fulfillment, Order Confirmation + Auto ZNS, Promo Stacking Engine, Webhook realtime sync). |
+| [don-hang-deep-dive.md](06-don-hang/don-hang.md) | Deep dive Đặt hàng (DH######): soft commitment layer giữa "ý định mua" và "hóa đơn". Schema 11 cột giá per line (4 trường × trước/sau thuế), shipping block với carrier integration (Grab/GHN/Viettel/J&T với badge KiotViet), fulfillment tracking "1/0". State machine 4-5 trạng thái, filter "Thời gian giao hàng" có **Ngày mai/Tuần sau/Quý sau** (future-dated unique), đồng bộ kênh online (Shopee/TikTok/Lazada/Tiki/FB/Zalo), Gộp đơn, auto-Trả hàng khi chuyển hoàn. 19 pain + Top 5 đột phá (Smart Carrier Routing, Multi-shipment Fulfillment, Order Confirmation + Auto ZNS, Promo Stacking Engine, Webhook realtime sync). |
 
 ---
 
@@ -85,6 +85,22 @@
 | File | Mô tả |
 |------|-------|
 | [dat-hang-nhap-deep-dive.md](./08-dat-hang-nhap/dat-hang-nhap-deep-dive.md) | Deep dive Đặt hàng nhập (DHN######) — **thuần nghiệp vụ**, không code/schema. Cầu nối cam kết shop ↔ NCC, không tác động tồn vật lý. 4 trạng thái workflow (Phiếu tạm → Đã xác nhận NCC → Nhập một phần → Hoàn thành). Mạnh: partial fulfillment (1 DHN qua N PN), cột "Số ngày chờ" cảnh báo NCC chậm, "Ngày nhập dự kiến" cho forecast, VAT per line, "Người nhận đặt" cho KAM thu mua, **"Đặt và gửi email" 1-click**, **tạo NCC inline**, **phím tắt F3/F8**, **tách 2 loại chi phí (NCC vs bên thứ 3)**, **setting "Giá nhập là giá vốn" per-phiếu**. 19 pain + Top 5 đột phá (Smart Reorder AI, 3-way Match + Vendor Scorecard, NCC Self-service Portal, PO Approval Workflow, Cash Flow Integration). |
+
+---
+
+### 09 — Giao vận (Đối tác giao hàng + Vận đơn)
+
+| File | Mô tả |
+|------|-------|
+| [giao-van-deep-dive.md](./09-giao-van/giao-van-deep-dive.md) | Deep dive 2 module giao vận song hành — **moat lớn nhất của KiotViet** ở thị trường VN. **Partner Delivery** master + tài chính tổng + đối soát kỳ với 15-18 carrier tích hợp 2-way (GHN/GHTK/J&T/Grab/AhaMove/NinjaVan/BE/BEST/EMS/Viettel/GreenSM/KShip + variants FW); **Vận đơn** chi tiết per shipment với 7 trạng thái sync 2-way + 3 tab (Thông tin / Lịch sử / **Yêu cầu hỗ trợ** độc nhất). 6 KPI tài chính per partner (mini AR/AP với COD + cước), suffix **FW** tách đối soát forward, KShip first-party với OTP + cấn trừ wallet, Multi-package, Khai giá, Tự mang ra bưu cục. 20 pain + Top 5 đột phá (Smart Carrier Quote + Routing, Carrier Scorecard, Real-time COD Push + Auto-pay, Tracking Link + Auto-notify, POD + Delivery Rating). |
+
+---
+
+### 10 — Quản lý người dùng & Phân quyền
+
+| File | Mô tả |
+|------|-------|
+| [quan-ly-nguoi-dung-deep-dive.md](10-quan-ly-nguoi-dung/quan-ly-nguoi-dung.md) | Deep dive User Manager + RBAC. **47 user** test data, 2 tab (Tài khoản / Vai trò), 3 role built-in (Quản trị chi nhánh / NV kho / NV thu ngân). **Multi-role assignment** ⭐ (1 user N role, permissions = UNION). Permission tree 3 tầng (Module → Sub-section → Resource → 8 actions) với **10 module top-level** + anchor menu + Ctrl+F search. **8 permission chuẩn per resource**: CRUD + Import + Xuất file + **Xem-sửa giá vốn** + **Xem-sửa giá nhập** (2 quyền nhạy cảm tách riêng — moat). **Phân quyền 3 chiều**: User × Chi nhánh × Nhóm hàng. Clone role, audit log riêng, bảo mật riêng module. 21 pain + Top 5 đột phá (Role Template + Diff + Versioning, ABAC + Separation of Duties, Magic Link Invite + Auto-expire, SSO + SCIM, Active Session + 4-eye Approval). |
 
 ---
 
@@ -109,3 +125,5 @@
 | Đặt hàng, fulfillment, carrier integration, gộp đơn | `06-don-hang/don-hang-deep-dive.md` |
 | Hóa đơn, HĐĐT compliance, multi-rate VAT, KShip, QR thu nợ | `07-hoa-don/hoa-don-deep-dive.md` |
 | Đặt hàng nhập, PO workflow, NCC, partial fulfillment, lead time | `08-dat-hang-nhap/dat-hang-nhap-deep-dive.md` |
+| Giao vận, đối tác giao hàng, vận đơn, COD, đối soát, KShip | `09-giao-van/giao-van-deep-dive.md` |
+| User Manager, RBAC, phân quyền, role, multi-role, audit log | `10-quan-ly-nguoi-dung/quan-ly-nguoi-dung-deep-dive.md` |
