@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thue &amp; Ke toan — QLBH</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;
+  --success:#16a34a;--success-light:#f0fdf4;
+  --warning:#d97706;--warning-light:#fffbeb;
+  --danger:#dc2626;--danger-light:#fef2f2;
+  --orange:#ea580c;--orange-light:#fff7ed;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;
+  --g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:var(--g100);color:var(--g800);display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:220px;background:var(--g800);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.logo{padding:16px;font-weight:700;font-size:16px;color:#fff;border-bottom:1px solid var(--g700)}
+.logo span{color:#60a5fa}
+.nav-group{padding:8px 0}
+.nav-group-label{padding:6px 16px;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--g400);letter-spacing:.05em}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 16px;color:var(--g300);cursor:pointer;transition:background .15s}
+.nav-item:hover{background:var(--g700);color:#fff}
+.nav-item.active{background:var(--primary);color:#fff}
+.nav-item .ico{width:18px;text-align:center}
+.nav-item .lbl{font-size:13px}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#fff;border-bottom:1px solid var(--g200);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:16px}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--g200);margin-bottom:16px}
+.tab{padding:10px 18px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--g500)}
+.tab:hover{color:var(--g800)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:#fff;color:var(--g700);border:1px solid var(--g300)}.btn-secondary:hover{background:var(--g50)}
+.btn-success{background:var(--success);color:#fff}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-icon{padding:6px;border-radius:6px;border:1px solid var(--g200);background:#fff;cursor:pointer;color:var(--g600)}
+.btn-icon:hover{background:var(--g50)}
+
+/* Cards */
+.card{background:#fff;border-radius:8px;border:1px solid var(--g200);padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-weight:600;font-size:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* KPI */
+.kpi-card{background:#fff;border-radius:8px;border:1px solid var(--g200);padding:16px}
+.kpi-label{font-size:12px;color:var(--g500);margin-bottom:4px}
+.kpi-value{font-size:22px;font-weight:700;color:var(--g800)}
+.kpi-sub{font-size:11px;color:var(--g400);margin-top:2px}
+
+/* Badges */
+.kpi-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-green{background:var(--success-light);color:var(--success)}
+.badge-yellow{background:var(--warning-light);color:var(--warning)}
+.badge-red{background:var(--danger-light);color:var(--danger)}
+.badge-blue{background:var(--primary-light);color:var(--primary)}
+.badge-purple{background:var(--purple-light);color:var(--purple)}
+.badge-gray{background:var(--g100);color:var(--g600)}
+.badge-orange{background:var(--orange-light);color:var(--orange)}
+
+/* Filter */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.filter-bar input,.filter-bar select{padding:7px 10px;border:1px solid var(--g300);border-radius:6px;font-size:13px;background:#fff;color:var(--g800)}
+.filter-bar input{min-width:220px}
+
+/* Table */
+.tbl-wrap{background:#fff;border-radius:8px;border:1px solid var(--g200);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--g50)}
+th{padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--g500);border-bottom:1px solid var(--g200)}
+td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--g100);color:var(--g700);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+.tbl-action{display:flex;gap:4px}
+
+/* Detail row */
+.detail-row td{background:var(--primary-light);padding:0}
+.detail-inner{padding:16px 20px}
+
+/* VAT rate pills */
+.vat-pill{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700}
+.vat-0{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
+.vat-5{background:#eff6ff;color:#1d4ed8;border:1px solid #93c5fd}
+.vat-8{background:#fffbeb;color:#b45309;border:1px solid #fcd34d}
+.vat-10{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+
+/* HDDT status */
+.inv-state{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+
+/* Provider card */
+.prov-card{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.prov-header{display:flex;align-items:center;gap:10px}
+.prov-logo{width:44px;height:44px;border-radius:8px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--g600);flex-shrink:0}
+.prov-name{font-weight:700;font-size:14px}
+.prov-mst{font-size:12px;color:var(--g500)}
+.prov-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.prov-stat{font-size:11px;color:var(--g500)}
+.prov-stat strong{display:block;font-size:14px;color:var(--g800)}
+.prov-active{border-top:3px solid var(--success)}
+
+/* Tax declaration widget */
+.tax-period{background:#fff;border:1px solid var(--g200);border-radius:8px;overflow:hidden}
+.tax-period-header{padding:12px 16px;background:var(--g50);border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between}
+.tax-period-title{font-weight:600;font-size:13px}
+.tax-rows{padding:0}
+.tax-row{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--g100);font-size:13px}
+.tax-row:last-child{border-bottom:none}
+.tax-row-label{flex:1;color:var(--g600)}
+.tax-row-code{width:60px;color:var(--g400);font-size:12px}
+.tax-row-value{width:140px;text-align:right;font-weight:500}
+.tax-row-value.bold{font-weight:700;color:var(--g800)}
+.tax-row-value.green{color:var(--success)}
+.tax-row.header-row{background:var(--g50);font-weight:600}
+.tax-row.sub{padding-left:32px}
+.tax-row.total{background:var(--primary-light);font-weight:700}
+
+/* Accounting export */
+.export-card{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:20px;display:flex;gap:16px;align-items:flex-start}
+.export-icon{width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.export-body{flex:1}
+.export-title{font-weight:700;font-size:15px;margin-bottom:4px}
+.export-desc{font-size:12px;color:var(--g500);line-height:1.5;margin-bottom:10px}
+.export-hist{font-size:11px;color:var(--g400)}
+
+/* Modal */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.mo-box{background:#fff;border-radius:10px;padding:24px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.mo-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.mo-close{cursor:pointer;font-size:18px;color:var(--g400)}
+.form-row{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--g600);margin-bottom:5px}
+.form-ctrl{width:100%;padding:8px 10px;border:1px solid var(--g300);border-radius:6px;font-size:13px}
+.form-ctrl:focus{outline:none;border-color:var(--primary)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-hint{font-size:11px;color:var(--g400);margin-top:3px}
+.mo-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--g100)}
+
+/* Divider */
+.sec-title{font-size:12px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;margin:16px 0 10px}
+
+/* Alert */
+.alert{border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px}
+.alert-info{background:var(--primary-light);border:1px solid #bfdbfe;color:#1e40af}
+.alert-warn{background:var(--warning-light);border:1px solid #fde68a;color:#92400e}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="logo"><span>QLBH</span> Pro</div>
+  <div class="nav-group">
+    <div class="nav-group-label">Ban hang</div>
+    <div class="nav-item" onclick="go('dashboard')"><span class="ico">&#127968;</span><span class="lbl">Tong quan</span></div>
+    <div class="nav-item" onclick="go('don-hang')"><span class="ico">&#128203;</span><span class="lbl">Don hang</span></div>
+    <div class="nav-item" onclick="go('hoa-don')"><span class="ico">&#128196;</span><span class="lbl">Hoa don</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Hang hoa</div>
+    <div class="nav-item" onclick="window.location.href='hang-hoa.html'"><span class="ico">&#128230;</span><span class="lbl">Hang hoa</span></div>
+    <div class="nav-item" onclick="go('kho')"><span class="ico">&#127970;</span><span class="lbl">Kho</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Doi tac</div>
+    <div class="nav-item" onclick="go('khach-hang')"><span class="ico">&#128101;</span><span class="lbl">Khach hang</span></div>
+    <div class="nav-item" onclick="go('nha-cung-cap')"><span class="ico">&#127968;</span><span class="lbl">Nha cung cap</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Nhan su</div>
+    <div class="nav-item" onclick="window.location.href='nhan-vien.html'"><span class="ico">&#128100;</span><span class="lbl">Nhan vien</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thuong mai</div>
+    <div class="nav-item" onclick="window.location.href='bang-gia-khuyen-mai.html'"><span class="ico">&#127991;&#65039;</span><span class="lbl">Bang gia &amp; KM</span></div>
+    <div class="nav-item" onclick="window.location.href='kenh-ban-hang.html'"><span class="ico">&#127760;</span><span class="lbl">Kenh ban hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Phan tich</div>
+    <div class="nav-item" onclick="window.location.href='bao-cao.html'"><span class="ico">&#128200;</span><span class="lbl">Bao cao</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Tai chinh</div>
+    <div class="nav-item" onclick="go('so-quy')"><span class="ico">&#128181;</span><span class="lbl">So quy</span></div>
+    <div class="nav-item active" onclick="window.location.href='thue-ke-toan.html'"><span class="ico">&#128196;</span><span class="lbl">Thue &amp; Ke toan</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">He thong</div>
+    <div class="nav-item" onclick="go('cau-hinh')"><span class="ico">&#9881;&#65039;</span><span class="lbl">Cau hinh</span></div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Thue &amp; Ke toan</div>
+    <div class="topbar-actions">
+      <button class="btn btn-secondary btn-sm" onclick="openMo('mo-export-kt')">&#128190; Xuat ke toan</button>
+      <button class="btn btn-primary btn-sm" onclick="openMo('mo-create-hddt')">+ Phat hanh HDDT</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="stab(event,'kt-pane','pane-hddt-ra')">HDDT dau ra</div>
+      <div class="tab" onclick="stab(event,'kt-pane','pane-hddt-vao')">HDDT dau vao</div>
+      <div class="tab" onclick="stab(event,'kt-pane','pane-bao-cao-thue')">Bao cao thue GTGT</div>
+      <div class="tab" onclick="stab(event,'kt-pane','pane-ke-toan')">Xuat ke toan</div>
+      <div class="tab" onclick="stab(event,'kt-pane','pane-cau-hinh')">Cau hinh HDDT</div>
+    </div>
+
+    <!-- Tab: HDDT dau ra -->
+    <div id="pane-hddt-ra" class="tab-pane kt-pane active">
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="kpi-card">
+          <div class="kpi-label">Phat hanh thang nay</div>
+          <div class="kpi-value">1,284</div>
+          <div class="kpi-sub"><span class="kpi-badge badge-green">1,261 hop le</span> <span class="kpi-badge badge-red">3 loi</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Tong tien thue GTGT</div>
+          <div class="kpi-value">48.6tr</div>
+          <div class="kpi-sub">Doanh thu: 542tr</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Cho ky dien tu</div>
+          <div class="kpi-value">18</div>
+          <div class="kpi-sub" style="color:var(--warning)">Qua 24h chua ky</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Da huy</div>
+          <div class="kpi-value">7</div>
+          <div class="kpi-sub">Trong thang</div>
+        </div>
+      </div>
+
+      <div class="alert alert-warn">
+        <span>&#9888;&#65039;</span>
+        <div><strong>18 hoa don chua ky dien tu</strong> — Nghị dinh 70/2025 yeu cau ky trong 24h ke tu phat hanh. Vui long ky ngay de tranh phat.</div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="Tim ma hoa don, ten KH, MST...">
+        <select>
+          <option>Thang 5/2025</option>
+          <option>Thang 4/2025</option>
+          <option>Thang 3/2025</option>
+          <option>Tuy chon</option>
+        </select>
+        <select>
+          <option>Tat ca trang thai</option>
+          <option>Cho ky</option>
+          <option>Da ky</option>
+          <option>Da gui CQT</option>
+          <option>Da huy</option>
+          <option>Loi</option>
+        </select>
+        <select>
+          <option>Tat ca thue suat</option>
+          <option>VAT 0%</option>
+          <option>VAT 5%</option>
+          <option>VAT 8%</option>
+          <option>VAT 10%</option>
+        </select>
+        <button class="btn btn-secondary btn-sm">Xuat Excel</button>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>So hoa don</th>
+              <th>Ngay phat hanh</th>
+              <th>Khach hang / MST</th>
+              <th>Tien hang</th>
+              <th>Thue suat</th>
+              <th>Tien thue</th>
+              <th>Tong tien</th>
+              <th>Trang thai</th>
+              <th>Lien ket</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="tog('dr-hddt1',this)" style="cursor:pointer">
+              <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+              <td><strong>01/001/0001284</strong></td>
+              <td>21/05/2025</td>
+              <td>Cty TNHH ABC Beauty<br><span style="font-size:11px;color:var(--g400)">MST: 0312345678</span></td>
+              <td>4,545,455</td>
+              <td><span class="vat-10">10%</span></td>
+              <td>454,545</td>
+              <td style="font-weight:600">5,000,000</td>
+              <td>
+                <div style="display:flex;flex-direction:column;gap:3px">
+                  <span class="kpi-badge badge-green">Da ky</span>
+                  <span class="kpi-badge badge-blue">Da gui CQT</span>
+                </div>
+              </td>
+              <td><span class="kpi-badge badge-gray">HĐ-00891</span></td>
+              <td>
+                <div class="tbl-action">
+                  <button class="btn-icon" title="Xem" onclick="event.stopPropagation()">&#128065;</button>
+                  <button class="btn-icon" title="Tai PDF" onclick="event.stopPropagation()">&#128196;</button>
+                  <button class="btn-icon" title="Gui email" onclick="event.stopPropagation()">&#128140;</button>
+                </div>
+              </td>
+            </tr>
+            <tr id="dr-hddt1" class="detail-row" style="display:none"><td colspan="11">
+              <div class="detail-inner">
+                <div class="grid-3">
+                  <div>
+                    <div class="sec-title">THONG TIN HOA DON</div>
+                    <div style="font-size:13px;line-height:1.8">
+                      Mau so: 01GTKT<br>
+                      Ky hieu: C25TYA<br>
+                      CQT chap nhan: 21/05/2025 14:32<br>
+                      Ma tra ve CQT: INV20250521-1284
+                    </div>
+                  </div>
+                  <div>
+                    <div class="sec-title">NOI DUNG HOA DON</div>
+                    <div style="font-size:13px;line-height:1.8">
+                      Kem duong SPF50 x10 = 1,600,000<br>
+                      Serum Vitamin C x5 = 900,000<br>
+                      Bo duong 3 buoc x4 = 2,045,455<br>
+                      <span style="color:var(--g400)">Tien hang: 4,545,455</span><br>
+                      <span style="color:var(--danger)">VAT 10%: 454,545</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="sec-title">HANH DONG</div>
+                    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:6px">&#128196; Tai XML</button>
+                    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:6px">&#128196; Tai PDF</button>
+                    <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:6px">&#128140; Gui email KH</button>
+                    <button class="btn btn-danger btn-sm" style="width:100%">Huy hoa don</button>
+                  </div>
+                </div>
+              </div>
+            </td></tr>
+
+            <tr onclick="tog('dr-hddt2',this)" style="cursor:pointer">
+              <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+              <td><strong>01/001/0001283</strong></td>
+              <td>21/05/2025</td>
+              <td>Nguyen Thi Lan<br><span style="font-size:11px;color:var(--g400)">Ca nhan (CCCD)</span></td>
+              <td>462,963</td>
+              <td><span class="vat-8">8%</span></td>
+              <td>37,037</td>
+              <td style="font-weight:600">500,000</td>
+              <td><span class="kpi-badge badge-yellow">Cho ky</span></td>
+              <td><span class="kpi-badge badge-gray">HĐ-00890</span></td>
+              <td>
+                <div class="tbl-action">
+                  <button class="btn btn-primary btn-sm" onclick="event.stopPropagation()">Ky dien tu</button>
+                  <button class="btn-icon" onclick="event.stopPropagation()">&#128065;</button>
+                </div>
+              </td>
+            </tr>
+            <tr id="dr-hddt2" class="detail-row" style="display:none"><td colspan="11">
+              <div class="detail-inner"><em style="color:var(--g500)">Chi tiet hoa don cho ky...</em></div>
+            </td></tr>
+
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><strong>01/001/0001282</strong></td>
+              <td>20/05/2025</td>
+              <td>Cty CP XYZ Trading<br><span style="font-size:11px;color:var(--g400)">MST: 0398765432</span></td>
+              <td>9,090,909</td>
+              <td><span class="vat-10">10%</span></td>
+              <td>909,091</td>
+              <td style="font-weight:600">10,000,000</td>
+              <td>
+                <div style="display:flex;flex-direction:column;gap:3px">
+                  <span class="kpi-badge badge-green">Da ky</span>
+                  <span class="kpi-badge badge-blue">Da gui CQT</span>
+                </div>
+              </td>
+              <td><span class="kpi-badge badge-gray">HĐ-00882</span></td>
+              <td><div class="tbl-action"><button class="btn-icon">&#128065;</button><button class="btn-icon">&#128196;</button></div></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox"></td>
+              <td style="color:var(--g400);text-decoration:line-through">01/001/0001271</td>
+              <td>18/05/2025</td>
+              <td>Nguyen Van A<br><span style="font-size:11px;color:var(--g400)">Ca nhan</span></td>
+              <td>272,727</td>
+              <td><span class="vat-10">10%</span></td>
+              <td>27,273</td>
+              <td style="font-weight:600;color:var(--g400)">300,000</td>
+              <td><span class="kpi-badge badge-gray">Da huy</span></td>
+              <td>—</td>
+              <td><div class="tbl-action"><button class="btn-icon">&#128065;</button></div></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><strong style="color:var(--danger)">Loi</strong></td>
+              <td>17/05/2025</td>
+              <td>Cty TNHH DEF<br><span style="font-size:11px;color:var(--g400)">MST: 0312399000</span></td>
+              <td>2,000,000</td>
+              <td><span class="vat-8">8%</span></td>
+              <td>160,000</td>
+              <td style="font-weight:600">2,160,000</td>
+              <td><span class="kpi-badge badge-red">Loi CQT</span></td>
+              <td><span class="kpi-badge badge-gray">HĐ-00875</span></td>
+              <td><div class="tbl-action"><button class="btn btn-secondary btn-sm">Xu ly loi</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: HDDT dau vao -->
+    <div id="pane-hddt-vao" class="tab-pane kt-pane">
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="kpi-card">
+          <div class="kpi-label">Nhan trong thang</div>
+          <div class="kpi-value">318</div>
+          <div class="kpi-sub"><span class="kpi-badge badge-green">291 hop le</span> <span class="kpi-badge badge-yellow">27 cho kiem tra</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Thue GTGT dau vao</div>
+          <div class="kpi-value">12.4tr</div>
+          <div class="kpi-sub">Duoc khau tru</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Tong tien hang nhap</div>
+          <div class="kpi-value">186tr</div>
+          <div class="kpi-sub">Chua VAT</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Khong hop le / sai MST</div>
+          <div class="kpi-value" style="color:var(--danger)">4</div>
+          <div class="kpi-sub">Can xu ly truoc khai thue</div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <span>&#8505;&#65039;</span>
+        <div>HDDT dau vao duoc nhan tu NCC qua email hoac upload XML. He thong tu dong doi chieu voi Phieu nhap hang tuong ung.</div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="Tim ma HDDT, ten NCC, MST...">
+        <select><option>Thang 5/2025</option><option>Thang 4/2025</option></select>
+        <select>
+          <option>Tat ca trang thai</option>
+          <option>Hop le</option>
+          <option>Cho doi chieu</option>
+          <option>Sai thong tin</option>
+        </select>
+        <button class="btn btn-secondary btn-sm">Upload XML/PDF</button>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>So hoa don</th>
+              <th>Ngay HĐ</th>
+              <th>Nha cung cap / MST</th>
+              <th>Tien hang</th>
+              <th>Thue suat</th>
+              <th>Tien thue</th>
+              <th>Tong tien</th>
+              <th>Trang thai</th>
+              <th>Phieu nhap</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>01/TRS/0012384</strong></td>
+              <td>19/05/2025</td>
+              <td>Cty CP Truong Son<br><span style="font-size:11px;color:var(--g400)">MST: 0300789012</span></td>
+              <td>45,454,545</td>
+              <td><span class="vat-10">10%</span></td>
+              <td>4,545,455</td>
+              <td style="font-weight:600">50,000,000</td>
+              <td><span class="kpi-badge badge-green">Hop le</span></td>
+              <td><span class="kpi-badge badge-gray">PN-00234</span></td>
+              <td><div class="tbl-action"><button class="btn-icon">&#128065;</button></div></td>
+            </tr>
+            <tr>
+              <td><strong>01/THT/0098271</strong></td>
+              <td>17/05/2025</td>
+              <td>Cty TNHH Thu Hien<br><span style="font-size:11px;color:var(--g400)">MST: 0309123456</span></td>
+              <td>22,727,273</td>
+              <td><span class="vat-8">8%</span></td>
+              <td>1,818,182</td>
+              <td style="font-weight:600">24,545,455</td>
+              <td><span class="kpi-badge badge-yellow">Cho doi chieu</span></td>
+              <td><span class="kpi-badge badge-yellow">Chua co PN</span></td>
+              <td><div class="tbl-action"><button class="btn btn-secondary btn-sm">Doi chieu</button></div></td>
+            </tr>
+            <tr>
+              <td><strong>01/NTN/0022109</strong></td>
+              <td>15/05/2025</td>
+              <td>Cty NTN Cosmetics<br><span style="font-size:11px;color:var(--g400)">MST: 0312000001</span></td>
+              <td>9,523,810</td>
+              <td><span class="vat-5">5%</span></td>
+              <td>476,190</td>
+              <td style="font-weight:600">10,000,000</td>
+              <td><span class="kpi-badge badge-red">Sai MST</span></td>
+              <td><span class="kpi-badge badge-gray">PN-00228</span></td>
+              <td><div class="tbl-action"><button class="btn btn-secondary btn-sm">Sua thong tin</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Bao cao thue GTGT -->
+    <div id="pane-bao-cao-thue" class="tab-pane kt-pane">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <select style="padding:7px 10px;border:1px solid var(--g300);border-radius:6px;font-size:13px">
+          <option>Ky khai thue: Thang 05/2025</option>
+          <option>Ky khai thue: Thang 04/2025</option>
+          <option>Ky khai thue: Quy 1/2025</option>
+        </select>
+        <span class="kpi-badge badge-yellow">Chua nop — Han 20/06/2025</span>
+        <button class="btn btn-secondary btn-sm">Tao To khai XML</button>
+        <button class="btn btn-primary btn-sm">Nop qua HTKK</button>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:16px">
+        <!-- To khai 01/GTGT summary -->
+        <div class="tax-period">
+          <div class="tax-period-header">
+            <div class="tax-period-title">To khai 01/GTGT — Thang 05/2025</div>
+            <span class="kpi-badge badge-yellow">Nhap lieu</span>
+          </div>
+          <div class="tax-rows">
+            <div class="tax-row header-row">
+              <span class="tax-row-label">II. Thue GTGT phai nop trong ky</span>
+              <span class="tax-row-code"></span>
+              <span class="tax-row-value"></span>
+            </div>
+            <div class="tax-row sub">
+              <span class="tax-row-label">Thue GTGT dau ra</span>
+              <span class="tax-row-code">[32]</span>
+              <span class="tax-row-value">48,620,000</span>
+            </div>
+            <div class="tax-row sub">
+              <span class="tax-row-label">Thue GTGT dau vao duoc khau tru</span>
+              <span class="tax-row-code">[25]</span>
+              <span class="tax-row-value" style="color:var(--success)">-12,440,000</span>
+            </div>
+            <div class="tax-row sub">
+              <span class="tax-row-label">Thue chua nop ky truoc chuyen sang</span>
+              <span class="tax-row-code">[37]</span>
+              <span class="tax-row-value">0</span>
+            </div>
+            <div class="tax-row total">
+              <span class="tax-row-label">Thue GTGT phai nop ky nay [40]</span>
+              <span class="tax-row-code"></span>
+              <span class="tax-row-value bold">36,180,000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bang ke dau ra / vao -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="card" style="padding:14px">
+            <div class="card-header" style="margin-bottom:8px">
+              <div class="card-title" style="font-size:13px">Bang ke HDDT dau ra (01-1/GTGT)</div>
+              <button class="btn btn-secondary btn-sm">Xuat Excel</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div>
+                <div style="font-size:11px;color:var(--g400)">VAT 0%</div>
+                <div style="font-size:14px;font-weight:700">0 hoa don</div>
+                <div style="font-size:11px;color:var(--g400)">0 VND</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--g400)">VAT 8%</div>
+                <div style="font-size:14px;font-weight:700">342 hoa don</div>
+                <div style="font-size:11px;color:var(--g400)">Thue: 18,240,000</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--g400)">VAT 10%</div>
+                <div style="font-size:14px;font-weight:700">942 hoa don</div>
+                <div style="font-size:11px;color:var(--g400)">Thue: 30,380,000</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:14px">
+            <div class="card-header" style="margin-bottom:8px">
+              <div class="card-title" style="font-size:13px">Bang ke HDDT dau vao (01-2/GTGT)</div>
+              <button class="btn btn-secondary btn-sm">Xuat Excel</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div>
+                <div style="font-size:11px;color:var(--g400)">VAT 5%</div>
+                <div style="font-size:14px;font-weight:700">12 hoa don</div>
+                <div style="font-size:11px;color:var(--g400)">Thue: 820,000</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--g400)">VAT 8%</div>
+                <div style="font-size:14px;font-weight:700">89 hoa don</div>
+                <div style="font-size:11px;color:var(--g400)">Thue: 6,120,000</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--g400)">VAT 10%</div>
+                <div style="font-size:14px;font-weight:700">217 hoa don</div>
+                <div style="font-size:11px;color:var(--g400)">Thue: 5,500,000</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lich su to khai -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Lich su ke khai thue</div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ky khai thue</th>
+                <th>Loai to khai</th>
+                <th>Han nop</th>
+                <th>Thue phai nop</th>
+                <th>Trang thai</th>
+                <th>Ngay nop</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Thang 04/2025</td>
+                <td>01/GTGT</td>
+                <td>20/05/2025</td>
+                <td style="font-weight:600">28,400,000</td>
+                <td><span class="kpi-badge badge-green">Da nop</span></td>
+                <td>18/05/2025</td>
+                <td><button class="btn-icon">&#128065;</button></td>
+              </tr>
+              <tr>
+                <td>Thang 03/2025</td>
+                <td>01/GTGT</td>
+                <td>20/04/2025</td>
+                <td style="font-weight:600">31,200,000</td>
+                <td><span class="kpi-badge badge-green">Da nop</span></td>
+                <td>15/04/2025</td>
+                <td><button class="btn-icon">&#128065;</button></td>
+              </tr>
+              <tr>
+                <td>Thang 02/2025</td>
+                <td>01/GTGT</td>
+                <td>20/03/2025</td>
+                <td style="font-weight:600">19,800,000</td>
+                <td><span class="kpi-badge badge-green">Da nop</span></td>
+                <td>20/03/2025</td>
+                <td><button class="btn-icon">&#128065;</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Xuat ke toan -->
+    <div id="pane-ke-toan" class="tab-pane kt-pane">
+      <div class="alert alert-info">
+        <span>&#8505;&#65039;</span>
+        <div>He thong xuat du lieu theo dinh dang phu hop de nhap vao phan mem ke toan (MISA, Fast Accounting). Du lieu xuat bao gom: chung tu ban hang, mua hang, thu chi, va so quy.</div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:16px">
+        <!-- MISA -->
+        <div class="export-card">
+          <div class="export-icon" style="background:#e8f5e9">&#128200;</div>
+          <div class="export-body">
+            <div class="export-title">Xuat sang MISA SME</div>
+            <div class="export-desc">
+              Xuat chung tu theo dinh dang XML cua MISA SME 2022+.<br>
+              Bao gom: HD ban hang, Phieu thu, Phieu nhap, Phieu chi.<br>
+              Ky du lieu: tu–den ngay tu chon.
+            </div>
+            <div class="export-hist">Xuat lan cuoi: 01/05/2025 (thang 04/2025)</div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn btn-primary btn-sm" onclick="openMo('mo-export-kt')">Xuat ngay</button>
+              <button class="btn btn-secondary btn-sm">Xem lich su</button>
+            </div>
+          </div>
+        </div>
+        <!-- Fast Accounting -->
+        <div class="export-card">
+          <div class="export-icon" style="background:#fff3e0">&#128202;</div>
+          <div class="export-body">
+            <div class="export-title">Xuat sang Fast Accounting</div>
+            <div class="export-desc">
+              Xuat file Excel theo template cua Fast Accounting 11+.<br>
+              Cot ma tai khoan can cau hinh truoc khi xuat.<br>
+              Ho tro: ban hang, mua hang, quy tien mat/ngan hang.
+            </div>
+            <div class="export-hist">Chua xuat lan nao</div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn btn-primary btn-sm">Xuat ngay</button>
+              <button class="btn btn-secondary btn-sm">Cau hinh</button>
+            </div>
+          </div>
+        </div>
+        <!-- Excel tong hop -->
+        <div class="export-card">
+          <div class="export-icon" style="background:#e8f5e9">&#128196;</div>
+          <div class="export-body">
+            <div class="export-title">Xuat Excel tong hop</div>
+            <div class="export-desc">
+              File Excel chua tat ca giao dich trong ky (ban, mua, thu, chi).<br>
+              Phu hop de ket chuyen thu cong vao bat ky phan mem ke toan nao.
+            </div>
+            <div class="export-hist">Xuat lan cuoi: 15/05/2025</div>
+            <div style="margin-top:10px">
+              <button class="btn btn-primary btn-sm">Xuat ngay</button>
+            </div>
+          </div>
+        </div>
+        <!-- So sach -->
+        <div class="export-card">
+          <div class="export-icon" style="background:#ede9fe">&#128211;</div>
+          <div class="export-body">
+            <div class="export-title">So sach to khai (Thong tu 200)</div>
+            <div class="export-desc">
+              In so kho (thẻ kho), so quy, bang can doi tai khoan.<br>
+              Theo TT200 hoac TT133 (tuy cau hinh).
+            </div>
+            <div class="export-hist">Tuy chon chung tu in</div>
+            <div style="margin-top:10px">
+              <button class="btn btn-primary btn-sm">Chon va in</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Cau hinh HDDT -->
+    <div id="pane-cau-hinh" class="tab-pane kt-pane">
+      <div class="sec-title">Nha cung cap HDDT</div>
+      <div class="grid-3" style="margin-bottom:20px">
+        <div class="prov-card prov-active">
+          <div class="prov-header">
+            <div class="prov-logo" style="background:#e3f2fd;color:#1565c0">VNPT</div>
+            <div>
+              <div class="prov-name">VNPT Invoice</div>
+              <div class="prov-mst">MST: 0100109106</div>
+            </div>
+            <span class="kpi-badge badge-green" style="margin-left:auto">Dang su dung</span>
+          </div>
+          <div class="prov-stats">
+            <div class="prov-stat"><strong>1,284</strong>Da phat hanh</div>
+            <div class="prov-stat"><strong>9,716</strong>Con lai (goi 11k)</div>
+            <div class="prov-stat"><strong>31/12/25</strong>Han dung</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn btn-secondary btn-sm">Cau hinh</button>
+            <button class="btn btn-secondary btn-sm">Ky so</button>
+            <button class="btn btn-secondary btn-sm">Xem log</button>
+          </div>
+        </div>
+
+        <div class="prov-card">
+          <div class="prov-header">
+            <div class="prov-logo" style="background:#fce4ec;color:#c62828">VT</div>
+            <div>
+              <div class="prov-name">Viettel CA</div>
+              <div class="prov-mst">MST: 0100109200</div>
+            </div>
+            <span class="kpi-badge badge-gray" style="margin-left:auto">Khong hoat dong</span>
+          </div>
+          <div class="prov-stats">
+            <div class="prov-stat"><strong>0</strong>Da phat hanh</div>
+            <div class="prov-stat"><strong>—</strong>Goi</div>
+            <div class="prov-stat"><strong>—</strong>Han</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn btn-secondary btn-sm">Kich hoat</button>
+          </div>
+        </div>
+
+        <div class="prov-card" style="border-style:dashed;align-items:center;justify-content:center;min-height:140px;cursor:pointer;display:flex;flex-direction:column;gap:8px" onclick="openMo('mo-add-provider')">
+          <div style="font-size:28px;color:var(--g300)">+</div>
+          <div style="font-size:13px;color:var(--g400)">Them nha cung cap</div>
+        </div>
+      </div>
+
+      <div class="sec-title">Mau HDDT da dang ky</div>
+      <div class="tbl-wrap" style="margin-bottom:20px">
+        <table>
+          <thead>
+            <tr>
+              <th>Mau so</th>
+              <th>Ky hieu</th>
+              <th>Ten mau</th>
+              <th>Loai hoa don</th>
+              <th>Ap dung tu</th>
+              <th>Trang thai</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>01GTKT</strong></td>
+              <td>C25TYA</td>
+              <td>HDGT hang hoa/dich vu (vat 8%/10%)</td>
+              <td>HĐGT — Gia tri gia tang</td>
+              <td>01/01/2025</td>
+              <td><span class="kpi-badge badge-green">Dang su dung</span></td>
+              <td><div class="tbl-action"><button class="btn-icon">&#128065;</button><button class="btn-icon">&#128393;</button></div></td>
+            </tr>
+            <tr>
+              <td><strong>02GTKT</strong></td>
+              <td>D25TYA</td>
+              <td>HDBH ban hang — hang hoa VAT 5%</td>
+              <td>HĐGT — Gia tri gia tang</td>
+              <td>01/01/2025</td>
+              <td><span class="kpi-badge badge-green">Dang su dung</span></td>
+              <td><div class="tbl-action"><button class="btn-icon">&#128065;</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec-title">Cau hinh thue suat mac dinh theo nhom hang</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nhom hang hoa</th>
+              <th>Thue suat VAT</th>
+              <th>Can cu phap ly</th>
+              <th>Ghi chu</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>My pham / Duong da</td>
+              <td><span class="vat-10">10%</span></td>
+              <td>Luat GTGT 2008 su doi 2013</td>
+              <td>Ap dung chung</td>
+              <td><button class="btn-icon">&#128393;</button></td>
+            </tr>
+            <tr>
+              <td>Thuc pham chuc nang</td>
+              <td><span class="vat-8">8%</span></td>
+              <td>NQ 43/2022 (giam thue)</td>
+              <td>Den 31/12/2025 theo NQ</td>
+              <td><button class="btn-icon">&#128393;</button></td>
+            </tr>
+            <tr>
+              <td>Duoc pham — thiet bi y te</td>
+              <td><span class="vat-5">5%</span></td>
+              <td>Luat GTGT, Phu luc I</td>
+              <td>Thue uu dai</td>
+              <td><button class="btn-icon">&#128393;</button></td>
+            </tr>
+            <tr>
+              <td>Hang xuat khau</td>
+              <td><span class="vat-0">0%</span></td>
+              <td>Dieu 9 Luat GTGT</td>
+              <td>Can chung tu xuat khau</td>
+              <td><button class="btn-icon">&#128393;</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Tao HDDT -->
+<div id="mo-create-hddt" class="mo">
+  <div class="mo-box">
+    <div class="mo-title">Phat hanh HDDT thu cong <span class="mo-close" onclick="closeMo('mo-create-hddt')">&#10005;</span></div>
+    <div class="alert alert-info" style="margin-bottom:14px">
+      <span>&#8505;&#65039;</span>
+      <span>Thuong HDDT duoc phat hanh tu dong khi xuat hoa don ban hang. Su dung chuc nang nay khi can phat hanh them.</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">Hoa don lien ket</label>
+        <input class="form-ctrl" placeholder="Tim ma hoa don...">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Mau HDDT</label>
+        <select class="form-ctrl"><option>01GTKT — C25TYA (VAT 10%)</option><option>02GTKT — D25TYA (VAT 5%)</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Ten nguoi mua</label>
+      <input class="form-ctrl" placeholder="Ten ca nhan hoac cong ty">
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">Ma so thue (neu co)</label>
+        <input class="form-ctrl" placeholder="0312345678">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Email gui hoa don</label>
+        <input class="form-ctrl" placeholder="email@example.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Dia chi</label>
+      <input class="form-ctrl" placeholder="Dia chi nguoi mua">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Thue suat</label>
+      <select class="form-ctrl">
+        <option>VAT 10%</option>
+        <option>VAT 8%</option>
+        <option>VAT 5%</option>
+        <option>VAT 0%</option>
+      </select>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-secondary" onclick="closeMo('mo-create-hddt')">Huy</button>
+      <button class="btn btn-primary">Phat hanh &amp; Ky dien tu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xuat ke toan -->
+<div id="mo-export-kt" class="mo">
+  <div class="mo-box">
+    <div class="mo-title">Xuat du lieu ke toan <span class="mo-close" onclick="closeMo('mo-export-kt')">&#10005;</span></div>
+    <div class="form-row">
+      <label class="form-label">Phan mem ke toan</label>
+      <select class="form-ctrl">
+        <option>MISA SME 2022</option>
+        <option>Fast Accounting 11</option>
+        <option>Excel tong hop</option>
+      </select>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">Tu ngay</label>
+        <input class="form-ctrl" type="date" value="2025-05-01">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Den ngay</label>
+        <input class="form-ctrl" type="date" value="2025-05-31">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Bao gom loai chung tu</label>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" checked> Hoa don ban hang (DT + GTGT dau ra)</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" checked> Phieu nhap hang (Chi phi + GTGT dau vao)</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" checked> Phieu thu / Phieu chi (So quy)</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox"> Phieu tra hang</label>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Chi nhanh</label>
+      <select class="form-ctrl"><option>Tat ca chi nhanh</option><option>HCM — Kho chinh</option><option>Ha Noi</option></select>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-secondary" onclick="closeMo('mo-export-kt')">Huy</button>
+      <button class="btn btn-primary">&#128190; Xuat file</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Them nha cung cap HDDT -->
+<div id="mo-add-provider" class="mo">
+  <div class="mo-box">
+    <div class="mo-title">Them nha cung cap HDDT <span class="mo-close" onclick="closeMo('mo-add-provider')">&#10005;</span></div>
+    <div class="form-row">
+      <label class="form-label">Nha cung cap</label>
+      <select class="form-ctrl">
+        <option>VNPT Invoice</option>
+        <option>Viettel CA</option>
+        <option>FPT Invoice</option>
+        <option>MISA meInvoice</option>
+        <option>Khac</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Username / API Key</label>
+      <input class="form-ctrl" placeholder="Tai khoan dang nhap he thong NCC">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Password / Secret</label>
+      <input class="form-ctrl" type="password" placeholder="••••••••">
+      <div class="form-hint">Luu tru ma hoa AES-256. Chi dung de ky HDDT.</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">MST doanh nghiep</label>
+      <input class="form-ctrl" placeholder="0312345678">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Moi truong</label>
+      <select class="form-ctrl">
+        <option>San xuat (Production)</option>
+        <option>Thu nghiem (Sandbox)</option>
+      </select>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-secondary" onclick="closeMo('mo-add-provider')">Huy</button>
+      <button class="btn btn-secondary">Kiem tra ket noi</button>
+      <button class="btn btn-primary">Luu cau hinh</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(id){window.location.href='index.html';}
+function tog(id){const d=document.getElementById(id);if(!d)return;d.style.display=d.style.display==='none'||d.style.display===''?'table-row':'none';}
+function stab(e,grp,targetId){
+  document.querySelectorAll('.'+grp).forEach(t=>{t.style.display='none';});
+  const t=document.getElementById(targetId);if(t)t.style.display='block';
+  e.target.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');}
+function openMo(id){document.getElementById(id).classList.add('open');}
+function closeMo(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
+
+// Wire up detail row clicks
+document.querySelectorAll('[onclick*="tog("]').forEach(tr=>{
+  const m=tr.getAttribute('onclick').match(/tog\('([^']+)'/);
+  if(m){tr.onclick=function(){tog(m[1]);}}
+});
+</script>
+</body>
+</html>

@@ -104,6 +104,46 @@
 
 ---
 
+### 11 — Nhân viên
+
+| File | Mô tả |
+|------|-------|
+| [01-tong-quan.md](./11-nhan-vien/01-tong-quan.md) | Tổng quan module Nhân viên: entity Employee với thông tin nhân sự + tài khoản hệ thống, Ca làm việc (Shift scheduling), Hoa hồng theo doanh số (CommissionRule — % doanh thu / % lợi nhuận / theo SKU / bậc thang). Tích hợp Sổ quỹ khi chi hoa hồng. 7 pain + Top 5 đột phá (Smart Shift dự báo đông khách, Hoa hồng realtime trên app, Hiệu suất NV dashboard, Time-based access, Chấm công GPS/WiFi). |
+
+---
+
+### 12 — Bảng giá & Khuyến mãi
+
+| File | Mô tả |
+|------|-------|
+| [01-tong-quan.md](./12-bang-gia-khuyen-mai/01-tong-quan.md) | Tổng quan module Bảng giá & Khuyến mãi: PriceBook multi-tier (lẻ/sỉ/VIP/kênh), quy tắc ưu tiên áp bảng, Promotion Engine (7 loại KM — % / số tiền / mua X tặng Y / combo / tặng hàng / ship / tích điểm nhân đôi), Coupon code + Voucher per KH, cơ chế stacking. Entity catalog BG01–BG06. 8 pain + Top 5 đột phá (Promotion Engine đầy đủ, Smart Stacking conflict detection, Flash Sale Scheduler, Voucher campaign tự động, Giá sàn enforcement nghiêm). |
+
+---
+
+### 13 — Báo cáo & Phân tích kinh doanh
+
+| File | Mô tả |
+|------|-------|
+| [01-tong-quan.md](./13-bao-cao/01-tong-quan.md) | Tổng quan hệ thống báo cáo: 7 nhóm (Bán hàng / Lợi nhuận / Hàng hóa & Kho / Khách hàng / Tài chính & Sổ quỹ / Nhân viên / Nhà cung cấp), Dashboard 5 khu vực (KPI hôm nay / Biểu đồ / Cảnh báo tồn / Top hàng / Công nợ), dimension lọc chung (thời gian / CN / NV / kênh), export Excel/PDF + scheduled email. Kiến trúc materialized view cho báo cáo phức tạp. 8 pain + Top 5 đột phá (P&L Dashboard thực sự, AI Insight ngôn ngữ tự nhiên, Custom Dashboard, Cohort Retention, Smart Alert push). |
+
+---
+
+### 14 — Kênh bán hàng online & Đa kênh
+
+| File | Mô tả |
+|------|-------|
+| [01-tong-quan.md](./14-kenh-ban-hang/01-tong-quan.md) | Tổng quan module Kênh bán hàng: Channel Account (Shopee / TikTok Shop / Lazada / Tiki / FB / Zalo OA / Instagram), Inventory Sync 2 chiều với buffer tồn tránh oversell, Order Pull workflow (webhook → DH nội bộ → fulfill → push tracking), Đối soát tiền sàn, Chat đa kênh hợp nhất (thread per conversation + lịch sử KH). Entity KBH01–KBH06. 8 pain + Top 5 đột phá (Real-time sync <5s, Smart Buffer, Unified Customer Identity Inbox 2.0, Cross-channel Reconciliation, Catalog Publisher 1-click). |
+
+---
+
+### 15 — Thuế & Kế toán
+
+| File | Mô tả |
+|------|-------|
+| [01-tong-quan.md](./15-thue-ke-toan/01-tong-quan.md) | Tổng quan module Thuế & Kế toán: HĐĐT đầu ra (liên kết HD — TT78/2021), HĐĐT đầu vào (validate qua CQT, liên kết PN), các mức VAT (0/5/8/10%), báo cáo thuế GTGT (bảng kê 01-1/01-2 + tờ khai 01/GTGT), kỳ kê khai tháng/quý, đặc thù Hộ kinh doanh (Nghị định 70/2025 bắt buộc HĐĐT từ 2026), nhà cung cấp HĐĐT (VNPT/Viettel/FPT/MISA). Entity KT01–KT07. 7 pain + Top 5 đột phá (1-Click Tax Report + nộp XML HTKK, HĐĐT đầu vào auto-fetch, Compliance Dashboard, Smart Error Recovery, Export MISA). |
+
+---
+
 ## Map nhanh: pain → tài liệu
 
 | Bạn muốn tìm hiểu về... | Xem tài liệu |
@@ -127,3 +167,11 @@
 | Đặt hàng nhập, PO workflow, NCC, partial fulfillment, lead time | `08-dat-hang-nhap/dat-hang-nhap-deep-dive.md` |
 | Giao vận, đối tác giao hàng, vận đơn, COD, đối soát, KShip | `09-giao-van/giao-van-deep-dive.md` |
 | User Manager, RBAC, phân quyền, role, multi-role, audit log | `10-quan-ly-nguoi-dung/quan-ly-nguoi-dung-deep-dive.md` |
+| Nhân viên, ca làm việc, hoa hồng, hiệu suất bán hàng | `11-nhan-vien/01-tong-quan.md` |
+| Bảng giá, khuyến mãi, coupon, voucher, tích điểm đổi điểm | `12-bang-gia-khuyen-mai/01-tong-quan.md` |
+| Báo cáo bán hàng, lợi nhuận, kho, khách hàng, dashboard | `13-bao-cao/01-tong-quan.md` |
+| Kênh bán hàng online, TMĐT sync, chat đa kênh, đối soát sàn | `14-kenh-ban-hang/01-tong-quan.md` |
+| Thuế VAT, HĐĐT đầu ra/vào, báo cáo thuế, kế toán | `15-thue-ke-toan/01-tong-quan.md` |
+| Chuyển hàng giữa chi nhánh, in-transit, chênh lệch | `02-hang-hoa-kho/08-chuyen-hang.md` |
+| Kiểm kho, cycle count, đối chiếu thực tế vs sổ sách | `02-hang-hoa-kho/09-kiem-kho.md` |
+| Sản xuất, BOM, pha chế, giá vốn thành phẩm, traceability NVL | `02-hang-hoa-kho/10-san-xuat.md` |

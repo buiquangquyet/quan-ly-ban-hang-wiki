@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Ban hang — Quan ly ban hang</title>
+<style>
+  :root {
+    --blue: #1a73e8;
+    --blue-dark: #1557b0;
+    --green: #1e8e3e;
+    --red: #d93025;
+    --orange: #f29900;
+    --gray-50: #f8f9fa;
+    --gray-100: #f1f3f4;
+    --gray-200: #e8eaed;
+    --gray-400: #9aa0a6;
+    --gray-600: #5f6368;
+    --gray-800: #3c4043;
+    --gray-900: #202124;
+    --white: #ffffff;
+    --sidebar-w: 320px;
+    --ctx-w: 280px;
+    --topbar-h: 48px;
+    --bottombar-h: 52px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: var(--gray-900); background: var(--gray-100); overflow: hidden; height: 100vh; }
+
+  /* LAYOUT */
+  .pos-root { display: flex; flex-direction: column; height: 100vh; }
+  .pos-topbar { height: var(--topbar-h); background: var(--blue); display: flex; align-items: center; gap: 8px; padding: 0 12px; flex-shrink: 0; }
+  .pos-body { flex: 1; display: flex; overflow: hidden; }
+  .pos-bottombar { height: var(--bottombar-h); background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 8px; gap: 8px; flex-shrink: 0; }
+
+  /* TOPBAR */
+  .topbar-logo { color: white; font-weight: 700; font-size: 15px; white-space: nowrap; margin-right: 8px; }
+  .topbar-tabs { display: flex; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: none; }
+  .topbar-tabs::-webkit-scrollbar { display: none; }
+  .tab-item { display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 6px 6px 0 0; color: white; cursor: pointer; white-space: nowrap; font-size: 12px; transition: background 0.15s; }
+  .tab-item:hover { background: rgba(255,255,255,0.25); }
+  .tab-item.active { background: var(--gray-100); color: var(--gray-900); }
+  .tab-item .tab-close { opacity: 0.6; font-size: 14px; line-height: 1; }
+  .tab-item:hover .tab-close { opacity: 1; }
+  .tab-add { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+  .topbar-icons { display: flex; align-items: center; gap: 4px; margin-left: 8px; }
+  .ti { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 14px; }
+  .ti:hover { background: rgba(255,255,255,0.3); }
+  .branch-badge { background: rgba(255,255,255,0.2); border-radius: 4px; color: white; padding: 4px 8px; font-size: 11px; white-space: nowrap; cursor: pointer; }
+  .branch-badge:hover { background: rgba(255,255,255,0.3); }
+
+  /* CART PANEL (left) */
+  .cart-panel { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; }
+  .cart-search { padding: 8px; border-bottom: 1px solid var(--gray-200); }
+  .cart-search input { width: 100%; padding: 7px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; outline: none; }
+  .cart-search input:focus { border-color: var(--blue); }
+  .cart-customer { padding: 6px 8px; background: #e8f0fe; border-bottom: 1px solid #c5d8fc; display: flex; align-items: center; gap: 8px; }
+  .cart-customer-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .cart-customer-info { flex: 1; min-width: 0; }
+  .cart-customer-name { font-weight: 600; font-size: 12px; truncate; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .cart-customer-sub { font-size: 11px; color: var(--gray-600); }
+  .cart-customer-clear { color: var(--gray-400); cursor: pointer; font-size: 16px; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 4px 0; }
+  .cart-item { padding: 8px 12px; border-bottom: 1px solid var(--gray-100); display: flex; gap: 8px; }
+  .cart-item:hover { background: var(--gray-50); }
+  .cart-item-img { width: 36px; height: 36px; background: var(--gray-200); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .cart-item-info { flex: 1; min-width: 0; }
+  .cart-item-name { font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cart-item-sku { font-size: 11px; color: var(--gray-400); }
+  .cart-item-price { color: var(--blue); font-weight: 600; font-size: 12px; }
+  .cart-item-discount { font-size: 11px; color: var(--red); text-decoration: line-through; }
+  .cart-item-qty { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+  .qty-btn { width: 22px; height: 22px; border: 1px solid var(--gray-200); border-radius: 4px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--gray-600); }
+  .qty-btn:hover { background: var(--gray-100); }
+  .qty-input { width: 36px; height: 22px; border: 1px solid var(--gray-200); border-radius: 4px; text-align: center; font-size: 12px; }
+  .cart-item-subtotal { font-weight: 600; font-size: 12px; white-space: nowrap; align-self: center; }
+  .cart-item-remove { color: var(--gray-400); cursor: pointer; align-self: flex-start; font-size: 16px; margin-top: 2px; }
+  .cart-item-remove:hover { color: var(--red); }
+  .cart-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gray-400); gap: 8px; }
+  .cart-empty-icon { font-size: 40px; }
+  .cart-note { padding: 6px 8px; border-top: 1px solid var(--gray-200); }
+  .cart-note input { width: 100%; padding: 5px 8px; border: 1px solid var(--gray-200); border-radius: 4px; font-size: 12px; color: var(--gray-600); outline: none; }
+
+  /* MIDDLE SECTION */
+  .middle-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .product-search-bar { padding: 8px 12px; background: white; border-bottom: 1px solid var(--gray-200); display: flex; gap: 8px; }
+  .product-search-bar input { flex: 1; padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; outline: none; }
+  .product-search-bar input:focus { border-color: var(--blue); }
+  .ps-hint { font-size: 11px; color: var(--gray-400); background: var(--gray-100); border-radius: 4px; padding: 3px 8px; white-space: nowrap; align-self: center; }
+  .mode-tabs { display: flex; padding: 8px 12px 0; gap: 4px; background: white; }
+  .mode-tab { padding: 7px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 12px; color: var(--gray-600); border: 1px solid var(--gray-200); border-bottom: none; background: var(--gray-50); }
+  .mode-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+  .mode-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; background: white; border-top: 2px solid var(--blue); }
+
+  /* PRODUCT GRID */
+  .product-grid-area { flex: 1; overflow-y: auto; padding: 12px; }
+  .cat-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .cat-chip { padding: 4px 10px; border-radius: 20px; border: 1px solid var(--gray-200); font-size: 11px; cursor: pointer; background: white; color: var(--gray-600); }
+  .cat-chip.active { background: var(--blue); color: white; border-color: var(--blue); }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .prod-card { border: 1px solid var(--gray-200); border-radius: 8px; cursor: pointer; overflow: hidden; background: white; transition: box-shadow 0.15s, border-color 0.15s; }
+  .prod-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); border-color: var(--blue); }
+  .prod-card-img { height: 70px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .prod-card-info { padding: 6px; }
+  .prod-card-name { font-size: 11px; font-weight: 500; line-height: 1.3; margin-bottom: 2px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .prod-card-price { font-size: 11px; color: var(--blue); font-weight: 600; }
+  .prod-card-stock { font-size: 10px; color: var(--gray-400); }
+  .prod-card-out { opacity: 0.5; pointer-events: none; }
+
+  /* DELIVERY MODE */
+  .delivery-form { padding: 12px; overflow-y: auto; flex: 1; }
+  .df-section { margin-bottom: 16px; }
+  .df-section-title { font-weight: 600; font-size: 12px; color: var(--gray-600); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .df-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .df-field { flex: 1; }
+  .df-label { font-size: 11px; color: var(--gray-600); margin-bottom: 3px; }
+  .df-input { width: 100%; padding: 7px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; outline: none; }
+  .df-input:focus { border-color: var(--blue); }
+  .df-select { width: 100%; padding: 7px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; outline: none; background: white; }
+  .carrier-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .carrier-card { border: 2px solid var(--gray-200); border-radius: 8px; padding: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .carrier-card.selected { border-color: var(--blue); background: #e8f0fe; }
+  .carrier-logo { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; }
+  .carrier-info { flex: 1; min-width: 0; }
+  .carrier-name { font-size: 11px; font-weight: 600; }
+  .carrier-fee { font-size: 11px; color: var(--green); font-weight: 600; }
+  .carrier-time { font-size: 10px; color: var(--gray-400); }
+
+  /* CONTEXT PANEL (right) */
+  .ctx-panel { width: var(--ctx-w); background: var(--white); border-left: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; }
+  .ctx-summary { padding: 12px; border-bottom: 1px solid var(--gray-200); }
+  .ctx-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
+  .ctx-row.total { font-weight: 700; font-size: 14px; border-top: 1px solid var(--gray-200); padding-top: 8px; margin-top: 2px; }
+  .ctx-row label { color: var(--gray-600); }
+  .ctx-row.discount label { color: var(--red); }
+  .ctx-row.discount span { color: var(--red); font-weight: 500; }
+  .ctx-discount-field { display: flex; gap: 6px; margin-bottom: 8px; }
+  .ctx-discount-field input { flex: 1; padding: 6px 8px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; outline: none; text-align: right; }
+  .ctx-discount-field select { padding: 6px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; background: white; }
+  .ctx-payment { padding: 10px 12px; border-bottom: 1px solid var(--gray-200); }
+  .ctx-payment-title { font-weight: 600; font-size: 12px; margin-bottom: 8px; }
+  .payment-methods { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .pm-chip { padding: 4px 8px; border-radius: 4px; border: 1px solid var(--gray-200); font-size: 11px; cursor: pointer; background: white; color: var(--gray-600); }
+  .pm-chip.active { background: var(--green); color: white; border-color: var(--green); }
+  .pm-chip.split { background: var(--orange); color: white; border-color: var(--orange); }
+  .payment-input-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .payment-input-row input { flex: 1; padding: 7px 8px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; text-align: right; }
+  .quick-amounts { display: flex; gap: 4px; flex-wrap: wrap; }
+  .qa-btn { padding: 4px 8px; background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 4px; font-size: 11px; cursor: pointer; }
+  .qa-btn:hover { background: var(--blue); color: white; border-color: var(--blue); }
+  .ctx-change { padding: 8px 12px; background: #e6f4ea; border-bottom: 1px solid #c3e6cb; }
+  .ctx-change-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--green); }
+  .ctx-extras { padding: 10px 12px; flex: 1; overflow-y: auto; }
+  .ctx-extras-title { font-weight: 600; font-size: 12px; margin-bottom: 8px; }
+  .extra-item { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 12px; }
+  .extra-item input[type="checkbox"] { accent-color: var(--blue); }
+  .extra-item label { flex: 1; color: var(--gray-700); }
+  .extra-item .ei-badge { font-size: 10px; background: var(--orange); color: white; padding: 1px 5px; border-radius: 3px; }
+  .ctx-staff { padding: 8px 12px; border-top: 1px solid var(--gray-200); }
+  .staff-select { width: 100%; padding: 6px 8px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; background: white; }
+
+  /* BOTTOM BAR */
+  .bb-mode-group { display: flex; gap: 4px; }
+  .bb-mode-btn { padding: 8px 14px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 12px; cursor: pointer; background: var(--gray-50); color: var(--gray-700); display: flex; align-items: center; gap: 4px; }
+  .bb-mode-btn.active { background: #e8f0fe; border-color: var(--blue); color: var(--blue); font-weight: 600; }
+  .bb-mode-btn:hover:not(.active) { background: var(--gray-100); }
+  .bb-spacer { flex: 1; }
+  .bb-stats { display: flex; gap: 16px; font-size: 11px; color: var(--gray-600); }
+  .bb-stat strong { color: var(--gray-900); }
+  .bb-actions { display: flex; gap: 6px; }
+  .bb-btn { padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--gray-200); background: white; color: var(--gray-700); }
+  .bb-btn:hover { background: var(--gray-100); }
+  .bb-btn-save { background: var(--gray-800); color: white; border-color: var(--gray-800); }
+  .bb-btn-save:hover { background: var(--gray-900); }
+  .bb-btn-pay { background: var(--blue); color: white; border-color: var(--blue); font-weight: 600; font-size: 14px; padding: 8px 24px; }
+  .bb-btn-pay:hover { background: var(--blue-dark); }
+  .bb-btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ORDER LIST PANEL (Ban thuong mode) */
+  .order-list-panel { flex: 1; overflow-y: auto; }
+  .order-list-header { padding: 8px 12px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+  .order-row { padding: 8px 12px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .order-row:hover { background: var(--gray-50); }
+  .order-row.selected { background: #e8f0fe; }
+  .order-code { font-size: 12px; font-weight: 600; color: var(--blue); }
+  .order-customer { font-size: 11px; color: var(--gray-600); }
+  .order-time { font-size: 11px; color: var(--gray-400); margin-left: auto; }
+  .order-amount { font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .order-status { font-size: 10px; padding: 2px 6px; border-radius: 10px; }
+  .os-tam { background: #fff3cd; color: #856404; }
+  .os-new { background: #d1e7dd; color: #0f5132; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
+  .modal-overlay.hidden { display: none; }
+  .modal-box { background: white; border-radius: 12px; width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-size: 15px; font-weight: 600; }
+  .modal-close { cursor: pointer; color: var(--gray-400); font-size: 20px; }
+  .modal-body { padding: 16px 20px; }
+  .modal-footer { padding: 12px 20px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; }
+  .btn-cancel { padding: 8px 16px; border: 1px solid var(--gray-200); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; }
+  .btn-primary { padding: 8px 20px; background: var(--blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; }
+  .form-field { margin-bottom: 12px; }
+  .form-label { font-size: 12px; color: var(--gray-600); margin-bottom: 4px; display: block; }
+  .form-label span { color: var(--red); }
+  .form-input { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; outline: none; }
+  .form-input:focus { border-color: var(--blue); }
+  .form-select { width: 100%; padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; background: white; outline: none; }
+
+  /* TOOLTIP */
+  .kbd { background: rgba(255,255,255,0.2); border-radius: 3px; padding: 1px 5px; font-size: 11px; font-family: monospace; color: white; margin-left: 4px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+
+  /* RETURN TO MAIN */
+  .back-link { display: flex; align-items: center; gap: 6px; padding: 0 8px; color: rgba(255,255,255,0.8); font-size: 12px; text-decoration: none; cursor: pointer; white-space: nowrap; }
+  .back-link:hover { color: white; }
+
+  /* NUMPAD */
+  .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px 12px; border-top: 1px solid var(--gray-200); }
+  .np-btn { padding: 8px; text-align: center; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+  .np-btn:hover { background: var(--gray-200); }
+  .np-btn.span2 { grid-column: span 2; }
+  .np-btn.clear { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="pos-root">
+
+  <!-- TOPBAR -->
+  <div class="pos-topbar">
+    <a class="back-link" href="index.html">← Trang chu</a>
+    <div class="topbar-tabs" id="tabList">
+      <div class="tab-item active" onclick="selTab(this, 'ban-nhanh')">
+        <span>Phieu ban moi</span>
+        <span class="tab-close" onclick="closeTab(event, this)">×</span>
+      </div>
+      <div class="tab-item" onclick="selTab(this, 'ban-nhanh')">
+        <span>DH001 - Nguyen Van A</span>
+        <span class="tab-close" onclick="closeTab(event, this)">×</span>
+      </div>
+    </div>
+    <div class="tab-add" onclick="addTab()" title="Tab moi (Ctrl+T)">+</div>
+    <div class="topbar-icons">
+      <div class="branch-badge">CN: Quan 1</div>
+      <div class="ti" title="Cau hinh">⚙</div>
+      <div class="ti" title="Lien he ho tro">?</div>
+      <div class="ti" title="Nguoi dung">👤</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="pos-body">
+
+    <!-- CART PANEL -->
+    <div class="cart-panel">
+      <div class="cart-search">
+        <input type="text" placeholder="Tim khach hang (F4)..." id="custSearch" />
+      </div>
+      <!-- Customer selected -->
+      <div class="cart-customer" id="custBar">
+        <div class="cart-customer-avatar">NA</div>
+        <div class="cart-customer-info">
+          <div class="cart-customer-name">Nguyen Van An</div>
+          <div class="cart-customer-sub">0912345678 · No: 0 · Tich diem: 1.250</div>
+        </div>
+        <span class="cart-customer-clear" onclick="clearCust()" title="Xoa khach">×</span>
+      </div>
+
+      <!-- Cart items -->
+      <div class="cart-items" id="cartItems">
+        <div class="cart-item">
+          <div class="cart-item-img">👟</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">Giay Adidas Ultraboost 22</div>
+            <div class="cart-item-sku">SKU: AD-UB22-BLK-42 · Mau den / Size 42</div>
+            <div class="cart-item-price">2.350.000 <span class="cart-item-discount">2.800.000</span></div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="chgQty(this,-1)">−</button>
+              <input class="qty-input" type="number" value="1" min="1">
+              <button class="qty-btn" onclick="chgQty(this,1)">+</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span class="cart-item-remove" onclick="removeItem(this)">×</span>
+            <span class="cart-item-subtotal">2.350.000</span>
+          </div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-img">🧦</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">Tat Adidas 3 doi</div>
+            <div class="cart-item-sku">SKU: AD-SOCK-3P-WH</div>
+            <div class="cart-item-price">180.000</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="chgQty(this,-1)">−</button>
+              <input class="qty-input" type="number" value="2" min="1">
+              <button class="qty-btn" onclick="chgQty(this,1)">+</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span class="cart-item-remove" onclick="removeItem(this)">×</span>
+            <span class="cart-item-subtotal">360.000</span>
+          </div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-img">🧴</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">Xit khu mui giay Sport Fresh</div>
+            <div class="cart-item-sku">SKU: ACC-SF-100ML</div>
+            <div class="cart-item-price">95.000</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="chgQty(this,-1)">−</button>
+              <input class="qty-input" type="number" value="1" min="1">
+              <button class="qty-btn" onclick="chgQty(this,1)">+</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span class="cart-item-remove" onclick="removeItem(this)">×</span>
+            <span class="cart-item-subtotal">95.000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-note">
+        <input type="text" placeholder="Ghi chu don hang..." />
+      </div>
+    </div>
+
+    <!-- MIDDLE SECTION -->
+    <div class="middle-section">
+      <div class="product-search-bar">
+        <input type="text" placeholder="Tim san pham, ma vach (F3)..." id="prodSearch" />
+        <span class="ps-hint">F3 — Tim nhanh</span>
+      </div>
+
+      <div class="mode-tabs">
+        <div class="mode-tab active" onclick="setMode('ban-nhanh', this)">Ban nhanh</div>
+        <div class="mode-tab" onclick="setMode('ban-thuong', this)">Ban thuong</div>
+        <div class="mode-tab" onclick="setMode('giao-hang', this)">Giao hang</div>
+      </div>
+
+      <div class="mode-content" id="modeContent">
+        <!-- Ban nhanh — product grid -->
+        <div id="view-ban-nhanh" class="product-grid-area">
+          <div class="cat-filter">
+            <span class="cat-chip active" onclick="filterCat(this)">Tat ca</span>
+            <span class="cat-chip" onclick="filterCat(this)">Giay the thao</span>
+            <span class="cat-chip" onclick="filterCat(this)">Giay casual</span>
+            <span class="cat-chip" onclick="filterCat(this)">Phu kien</span>
+            <span class="cat-chip" onclick="filterCat(this)">Tui xach</span>
+            <span class="cat-chip" onclick="filterCat(this)">Quan ao</span>
+          </div>
+          <div class="product-grid">
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">👟</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Giay Adidas Ultraboost 22</div>
+                <div class="prod-card-price">2.350.000</div>
+                <div class="prod-card-stock">Ton: 8</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">👟</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Nike Air Max 270</div>
+                <div class="prod-card-price">3.100.000</div>
+                <div class="prod-card-stock">Ton: 4</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">🥿</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Converse Chuck 70</div>
+                <div class="prod-card-price">1.450.000</div>
+                <div class="prod-card-stock">Ton: 12</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">👞</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Vans Old Skool</div>
+                <div class="prod-card-price">1.200.000</div>
+                <div class="prod-card-stock">Ton: 6</div>
+              </div>
+            </div>
+            <div class="prod-card prod-card-out">
+              <div class="prod-card-img">👠</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">New Balance 574</div>
+                <div class="prod-card-price">1.850.000</div>
+                <div class="prod-card-stock" style="color:var(--red)">Het hang</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">🧦</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Tat Adidas 3 doi</div>
+                <div class="prod-card-price">180.000</div>
+                <div class="prod-card-stock">Ton: 45</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">🎒</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Balo Nike Elemental</div>
+                <div class="prod-card-price">850.000</div>
+                <div class="prod-card-stock">Ton: 3</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">🧴</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Xit khu mui Sport Fresh</div>
+                <div class="prod-card-price">95.000</div>
+                <div class="prod-card-stock">Ton: 22</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">👟</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Puma RS-X3 Puzzle</div>
+                <div class="prod-card-price">2.100.000</div>
+                <div class="prod-card-stock">Ton: 5</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">🥾</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Timberland 6-inch Boot</div>
+                <div class="prod-card-price">4.500.000</div>
+                <div class="prod-card-stock">Ton: 2</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">👟</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Skechers D'Lites</div>
+                <div class="prod-card-price">1.650.000</div>
+                <div class="prod-card-stock">Ton: 9</div>
+              </div>
+            </div>
+            <div class="prod-card" onclick="addToCart(this)">
+              <div class="prod-card-img">🎽</div>
+              <div class="prod-card-info">
+                <div class="prod-card-name">Ao Nike Dri-FIT</div>
+                <div class="prod-card-price">650.000</div>
+                <div class="prod-card-stock">Ton: 18</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ban thuong — order list -->
+        <div id="view-ban-thuong" class="order-list-panel" style="display:none">
+          <div class="order-list-header">
+            <span>Phieu tam</span>
+            <span style="margin-left:auto;font-weight:400;color:var(--gray-400)">5 phieu</span>
+            <button onclick="openNewOrder()" style="margin-left:8px;padding:4px 10px;background:var(--blue);color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px">+ Tao moi</button>
+          </div>
+          <div class="order-row selected">
+            <div>
+              <div class="order-code">PT0001</div>
+              <div class="order-customer">Nguyen Van An — 3 san pham</div>
+            </div>
+            <div class="order-time">14:25</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+              <span class="order-status os-tam">Phieu tam</span>
+              <span class="order-amount">2.805.000</span>
+            </div>
+          </div>
+          <div class="order-row">
+            <div>
+              <div class="order-code">PT0002</div>
+              <div class="order-customer">Khach le — 1 san pham</div>
+            </div>
+            <div class="order-time">13:50</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+              <span class="order-status os-tam">Phieu tam</span>
+              <span class="order-amount">850.000</span>
+            </div>
+          </div>
+          <div class="order-row">
+            <div>
+              <div class="order-code">DH000190</div>
+              <div class="order-customer">Tran Thi Mai — 2 san pham</div>
+            </div>
+            <div class="order-time">13:10</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+              <span class="order-status os-new">Da dat</span>
+              <span class="order-amount">4.700.000</span>
+            </div>
+          </div>
+          <div style="padding:16px;text-align:center;color:var(--gray-400);font-size:12px">
+            Xem them phieu cu...
+          </div>
+        </div>
+
+        <!-- Giao hang mode -->
+        <div id="view-giao-hang" class="delivery-form" style="display:none">
+          <div class="df-section">
+            <div class="df-section-title">Thong tin nguoi nhan</div>
+            <div class="df-row">
+              <div class="df-field">
+                <div class="df-label">Ho ten nguoi nhan *</div>
+                <input class="df-input" type="text" value="Nguyen Van An" />
+              </div>
+              <div class="df-field" style="max-width:140px">
+                <div class="df-label">So dien thoai *</div>
+                <input class="df-input" type="tel" value="0912345678" />
+              </div>
+            </div>
+            <div class="df-row">
+              <div class="df-field">
+                <div class="df-label">Tinh / Thanh pho *</div>
+                <select class="df-select">
+                  <option>TP. Ho Chi Minh</option>
+                  <option>Ha Noi</option>
+                  <option>Da Nang</option>
+                </select>
+              </div>
+              <div class="df-field">
+                <div class="df-label">Phuong / Xa *</div>
+                <select class="df-select">
+                  <option>Phuong Ben Nghe</option>
+                  <option>Phuong Ben Thanh</option>
+                  <option>Phuong Nguyen Thai Binh</option>
+                </select>
+              </div>
+            </div>
+            <div class="df-field">
+              <div class="df-label">Dia chi cu the *</div>
+              <input class="df-input" type="text" placeholder="So nha, duong..." value="123 Nguyen Hue" />
+            </div>
+          </div>
+
+          <div class="df-section">
+            <div class="df-section-title">Chon don vi van chuyen</div>
+            <div class="carrier-list">
+              <div class="carrier-card selected" onclick="selCarrier(this)">
+                <div class="carrier-logo" style="background:#e82e21">GHN</div>
+                <div class="carrier-info">
+                  <div class="carrier-name">Giao Hang Nhanh</div>
+                  <div class="carrier-fee">35.000d</div>
+                  <div class="carrier-time">2–3 ngay</div>
+                </div>
+              </div>
+              <div class="carrier-card" onclick="selCarrier(this)">
+                <div class="carrier-logo" style="background:#00a651">GHTK</div>
+                <div class="carrier-info">
+                  <div class="carrier-name">Giao Hang Tiet Kiem</div>
+                  <div class="carrier-fee">28.000d</div>
+                  <div class="carrier-time">3–5 ngay</div>
+                </div>
+              </div>
+              <div class="carrier-card" onclick="selCarrier(this)">
+                <div class="carrier-logo" style="background:#ed1c24">J&T</div>
+                <div class="carrier-info">
+                  <div class="carrier-name">J&T Express</div>
+                  <div class="carrier-fee">32.000d</div>
+                  <div class="carrier-time">2–4 ngay</div>
+                </div>
+              </div>
+              <div class="carrier-card" onclick="selCarrier(this)">
+                <div class="carrier-logo" style="background:#cc0000">VTP</div>
+                <div class="carrier-info">
+                  <div class="carrier-name">Viettel Post</div>
+                  <div class="carrier-fee">30.000d</div>
+                  <div class="carrier-time">3–4 ngay</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="df-section">
+            <div class="df-section-title">Thong tin van don</div>
+            <div class="df-row">
+              <div class="df-field">
+                <div class="df-label">Thu phi khi giao</div>
+                <select class="df-select">
+                  <option>Nguoi ban tra phi</option>
+                  <option>Nguoi mua tra phi</option>
+                </select>
+              </div>
+              <div class="df-field">
+                <div class="df-label">Thu tien ho (COD)</div>
+                <input class="df-input" type="text" value="2.840.000" />
+              </div>
+            </div>
+            <div class="df-row">
+              <div class="df-field">
+                <div class="df-label">Chieu cao (cm)</div>
+                <input class="df-input" type="number" value="20" />
+              </div>
+              <div class="df-field">
+                <div class="df-label">Chieu rong (cm)</div>
+                <input class="df-input" type="number" value="15" />
+              </div>
+              <div class="df-field">
+                <div class="df-label">Chieu dai (cm)</div>
+                <input class="df-input" type="number" value="30" />
+              </div>
+              <div class="df-field">
+                <div class="df-label">Can nang (g)</div>
+                <input class="df-input" type="number" value="800" />
+              </div>
+            </div>
+            <div class="df-field">
+              <div class="df-label">Ghi chu giao hang</div>
+              <input class="df-input" type="text" placeholder="Goi truoc khi giao, de o bao ve..." />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTEXT PANEL -->
+    <div class="ctx-panel">
+      <div class="ctx-summary">
+        <div class="ctx-row">
+          <label>So luong SP:</label>
+          <span>3 (4 cai)</span>
+        </div>
+        <div class="ctx-row">
+          <label>Tam tinh:</label>
+          <span>2.805.000</span>
+        </div>
+        <div class="ctx-row discount">
+          <label>Chiet khau:</label>
+          <span>— 0</span>
+        </div>
+        <div class="ctx-discount-field">
+          <input type="text" placeholder="0" />
+          <select>
+            <option>VND</option>
+            <option>%</option>
+          </select>
+        </div>
+        <div class="ctx-row">
+          <label>Phi giao hang:</label>
+          <span>35.000</span>
+        </div>
+        <div class="ctx-row">
+          <label>Thue VAT (10%):</label>
+          <span>280.500</span>
+        </div>
+        <div class="ctx-row total">
+          <label>TONG CONG:</label>
+          <span style="color:var(--blue)">3.120.500</span>
+        </div>
+      </div>
+
+      <div class="ctx-payment">
+        <div class="ctx-payment-title">Phuong thuc thanh toan</div>
+        <div class="payment-methods">
+          <span class="pm-chip active" onclick="selPM(this)">Tien mat</span>
+          <span class="pm-chip" onclick="selPM(this)">Chuyen khoan</span>
+          <span class="pm-chip" onclick="selPM(this)">Quet the</span>
+          <span class="pm-chip" onclick="selPM(this)">Vi dien tu</span>
+          <span class="pm-chip split" onclick="selPM(this)">Tach TT</span>
+        </div>
+        <div class="payment-input-row">
+          <input type="text" value="3.120.500" id="payAmount" />
+        </div>
+        <div class="quick-amounts">
+          <span class="qa-btn" onclick="setQuick(3120500)">Dung</span>
+          <span class="qa-btn" onclick="setQuick(3500000)">3.500.000</span>
+          <span class="qa-btn" onclick="setQuick(4000000)">4.000.000</span>
+          <span class="qa-btn" onclick="setQuick(5000000)">5.000.000</span>
+        </div>
+      </div>
+
+      <div class="ctx-change">
+        <div class="ctx-change-row">
+          <span>Tien thua:</span>
+          <span>0</span>
+        </div>
+      </div>
+
+      <div class="ctx-extras">
+        <div class="ctx-extras-title">Tuy chon them</div>
+        <div class="extra-item">
+          <input type="checkbox" id="opt-invoice" />
+          <label for="opt-invoice">Xuat hoa don GTGT</label>
+        </div>
+        <div class="extra-item">
+          <input type="checkbox" id="opt-loyalty" checked />
+          <label for="opt-loyalty">Tich diem thanh vien</label>
+          <span class="ei-badge">+312 diem</span>
+        </div>
+        <div class="extra-item">
+          <input type="checkbox" id="opt-sms" />
+          <label for="opt-sms">Gui SMS xac nhan</label>
+        </div>
+        <div class="extra-item">
+          <input type="checkbox" id="opt-print" checked />
+          <label for="opt-print">In hoa don</label>
+        </div>
+        <div class="extra-item">
+          <input type="checkbox" id="opt-email" />
+          <label for="opt-email">Gui email hoa don</label>
+        </div>
+      </div>
+
+      <div class="ctx-staff">
+        <select class="staff-select">
+          <option>Nhan vien: Tran Thi Lan (HD)</option>
+          <option>Nguyen Van Binh (HD)</option>
+          <option>Le Thi Huong (HD)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="pos-bottombar">
+    <div class="bb-mode-group">
+      <div class="bb-mode-btn active" id="btn-ban-nhanh" onclick="setMode('ban-nhanh', null, this)">
+        ⚡ Ban nhanh
+      </div>
+      <div class="bb-mode-btn" id="btn-ban-thuong" onclick="setMode('ban-thuong', null, this)">
+        📋 Ban thuong
+      </div>
+      <div class="bb-mode-btn" id="btn-giao-hang" onclick="setMode('giao-hang', null, this)">
+        🚚 Giao hang
+      </div>
+    </div>
+    <div class="bb-spacer"></div>
+    <div class="bb-stats">
+      <span>Hom nay: <strong>28 HD</strong></span>
+      <span>Doanh thu: <strong>45.2tr</strong></span>
+    </div>
+    <div class="bb-actions">
+      <button class="bb-btn" onclick="openDiscount()">Khuyen mai</button>
+      <button class="bb-btn bb-btn-save" onclick="saveOrder()">Luu phieu (F5)</button>
+      <button class="bb-btn bb-btn-pay" onclick="openPayment()">Thanh toan (F9)</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay hidden" id="paymentModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Xac nhan thanh toan</h3>
+      <span class="modal-close" onclick="closeMo('paymentModal')">×</span>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--gray-50);border-radius:8px;padding:12px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--gray-600)">
+          <span>Khach hang:</span><span style="font-weight:500;color:var(--gray-900)">Nguyen Van An</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--gray-600)">
+          <span>So san pham:</span><span>3 loai (4 cai)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--blue);border-top:1px solid var(--gray-200);padding-top:8px;margin-top:4px">
+          <span>TONG CONG:</span><span>3.120.500d</span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Phuong thuc thanh toan</label>
+        <select class="form-select">
+          <option>Tien mat</option>
+          <option>Chuyen khoan ngan hang</option>
+          <option>Quet the</option>
+          <option>Vi Momo</option>
+          <option>Vi ZaloPay</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">So tien khach tra</label>
+        <input class="form-input" type="text" value="3.200.000" />
+      </div>
+      <div style="background:#e6f4ea;border-radius:6px;padding:10px;display:flex;justify-content:space-between;font-weight:600;color:var(--green)">
+        <span>Tien thua tra khach:</span><span>79.500d</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeMo('paymentModal')">Huy (Esc)</button>
+      <button class="btn-primary" onclick="confirmPayment()">Hoan tat (Enter)</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS TOAST -->
+<div id="toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:300;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.2)">
+  Thanh toan thanh cong! HD001234 da duoc tao.
+</div>
+
+<script>
+  let currentMode = 'ban-nhanh';
+  let tabCount = 2;
+
+  // Mode switching
+  function setMode(mode, tabEl, btnEl) {
+    currentMode = mode;
+
+    // Update mode tabs in middle section
+    if (tabEl) {
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      tabEl.classList.add('active');
+    }
+
+    // Update bottom bar buttons
+    document.querySelectorAll('.bb-mode-btn').forEach(b => b.classList.remove('active'));
+    const bbBtn = btnEl || document.getElementById('btn-' + mode);
+    if (bbBtn) bbBtn.classList.add('active');
+
+    // Show/hide views
+    document.getElementById('view-ban-nhanh').style.display = mode === 'ban-nhanh' ? '' : 'none';
+    document.getElementById('view-ban-thuong').style.display = mode === 'ban-thuong' ? '' : 'none';
+    document.getElementById('view-giao-hang').style.display = mode === 'giao-hang' ? '' : 'none';
+
+    // Sync mode tabs display
+    const tabs = document.querySelectorAll('.mode-tab');
+    const modeMap = ['ban-nhanh', 'ban-thuong', 'giao-hang'];
+    tabs.forEach((t, i) => t.classList.toggle('active', modeMap[i] === mode));
+
+    // Update pay button text
+    const payBtn = document.querySelector('.bb-btn-pay');
+    if (mode === 'giao-hang') payBtn.textContent = 'Tao don giao hang (F9)';
+    else if (mode === 'ban-thuong') payBtn.textContent = 'Xac nhan dat hang (F9)';
+    else payBtn.textContent = 'Thanh toan (F9)';
+  }
+
+  // Tab management
+  function selTab(el, mode) {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function closeTab(event, el) {
+    event.stopPropagation();
+    const tab = el.closest('.tab-item');
+    const tabs = document.querySelectorAll('.tab-item');
+    if (tabs.length > 1) {
+      tab.remove();
+    }
+  }
+
+  function addTab() {
+    tabCount++;
+    const tabList = document.getElementById('tabList');
+    const newTab = document.createElement('div');
+    newTab.className = 'tab-item';
+    newTab.innerHTML = `<span>Phieu ban ${tabCount}</span><span class="tab-close" onclick="closeTab(event, this)">×</span>`;
+    newTab.onclick = function() { selTab(this, 'ban-nhanh'); };
+    tabList.appendChild(newTab);
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    newTab.classList.add('active');
+  }
+
+  // Cart operations
+  function chgQty(btn, delta) {
+    const input = btn.closest('.cart-item-qty').querySelector('.qty-input');
+    const v = Math.max(1, parseInt(input.value) + delta);
+    input.value = v;
+  }
+
+  function removeItem(el) {
+    const item = el.closest('.cart-item');
+    item.style.opacity = '0';
+    item.style.transition = 'opacity 0.2s';
+    setTimeout(() => item.remove(), 200);
+  }
+
+  function clearCust() {
+    document.getElementById('custBar').style.display = 'none';
+  }
+
+  function addToCart(card) {
+    const name = card.querySelector('.prod-card-name').textContent;
+    // Flash feedback
+    card.style.background = '#e8f0fe';
+    card.style.borderColor = 'var(--blue)';
+    setTimeout(() => {
+      card.style.background = '';
+      card.style.borderColor = '';
+    }, 300);
+
+    const toast = document.getElementById('toast');
+    toast.textContent = '+ Da them: ' + name;
+    toast.style.background = 'var(--blue)';
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 1500);
+  }
+
+  // Category filter
+  function filterCat(el) {
+    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Payment method selection
+  function selPM(el) {
+    document.querySelectorAll('.pm-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Quick amounts
+  function setQuick(amount) {
+    document.getElementById('payAmount').value = amount.toLocaleString('vi-VN');
+  }
+
+  // Carrier selection
+  function selCarrier(el) {
+    document.querySelectorAll('.carrier-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Modals
+  function openPayment() {
+    document.getElementById('paymentModal').classList.remove('hidden');
+  }
+
+  function closeMo(id) {
+    document.getElementById(id).classList.add('hidden');
+  }
+
+  function confirmPayment() {
+    closeMo('paymentModal');
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Thanh toan thanh cong! HD' + (Math.floor(Math.random()*1000)+1000) + ' da duoc tao.';
+    toast.style.background = 'var(--green)';
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 3000);
+  }
+
+  function saveOrder() {
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Da luu phieu tam PT0003';
+    toast.style.background = 'var(--gray-800)';
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 2000);
+  }
+
+  function openDiscount() {
+    const input = document.querySelector('.ctx-discount-field input');
+    input.focus();
+    input.select();
+  }
+
+  function openNewOrder() {
+    addTab();
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F3') { e.preventDefault(); document.getElementById('prodSearch').focus(); }
+    if (e.key === 'F4') { e.preventDefault(); document.getElementById('custSearch').focus(); }
+    if (e.key === 'F5') { e.preventDefault(); saveOrder(); }
+    if (e.key === 'F9') { e.preventDefault(); openPayment(); }
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 't') { e.preventDefault(); addTab(); }
+  });
+</script>
+</body>
+</html>

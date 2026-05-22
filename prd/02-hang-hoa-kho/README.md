@@ -16,6 +16,10 @@ Phân tích toàn bộ module Hàng hóa và Tồn kho của KiotViet, bao gồm
 | [04-ban-hang.md](./04-ban-hang.md) | Nghiệp vụ Bán hàng — góc tác động tồn kho, reservation, âm tồn, race condition | Phân tích đầu ra tồn kho và tính chính xác kế toán |
 | [05-tra-hang.md](./05-tra-hang.md) | Trả hàng bán (TH) + Trả hàng nhập (TPN) — so sánh, edge cases, fraud detection | Phân tích vòng đời ngược của hàng hóa |
 | [06-lo-va-serial.md](./06-lo-va-serial.md) | Lô/Hạn sử dụng (Batch) + Serial/IMEI — data model 3 tầng, FEFO, gap analysis | Tracking nâng cao cho F&B, dược, điện máy |
+| [07-chi-tiet-hang-hoa.md](./07-chi-tiet-hang-hoa.md) | Màn hình Chi tiết Hàng hóa — 5 tabs, schema E01, biến thể, UoM, định giá, tồn multi-branch, business rules, điểm đau UX | Phân tích toàn diện Product Detail screen |
+| [08-chuyen-hang.md](./08-chuyen-hang.md) | Phiếu Chuyển hàng (TRF) — điều phối tồn kho giữa chi nhánh, state machine, xử lý chênh lệch, phân quyền, in-transit visibility | Điều chuyển hàng trong chuỗi đa chi nhánh |
+| [09-kiem-kho.md](./09-kiem-kho.md) | Phiếu Kiểm kho (KK) — đối chiếu tồn thực tế vs sổ sách, cycle count, xử lý thừa/thiếu, kiểm Serial/Lô, báo cáo chênh lệch | Kiểm soát tồn kho định kỳ và phát hiện thất thoát |
+| [10-san-xuat.md](./10-san-xuat.md) | Phiếu Sản xuất (SX) + BOM — công thức định mức NVL, tính giá vốn thành phẩm, traceability lô NVL→thành phẩm, F&B/lắp ráp | Quản lý sản xuất và pha chế đơn giản |
 
 ---
 
@@ -72,9 +76,9 @@ Bảng tham chiếu nhanh toàn bộ entities, đánh số nhất quán qua tấ
 ### Warehouse Operations
 | # | Entity | Tên VN | Tham chiếu |
 |---|---|---|---|
-| E27 | StockTransfer | Phiếu chuyển hàng (TRF) | `01-tong-quan.md` §C1 |
-| E28 | StockTake | Phiếu kiểm kho (KK) | `01-tong-quan.md` §C2 |
-| E29 | ManufacturingVoucher | Phiếu sản xuất (SX) | `01-tong-quan.md` §C3 |
+| E27 | StockTransfer | Phiếu chuyển hàng (TRF) | `08-chuyen-hang.md` §2 |
+| E28 | StockTake | Phiếu kiểm kho (KK) | `09-kiem-kho.md` §2 |
+| E29 | ManufacturingVoucher | Phiếu sản xuất (SX) | `10-san-xuat.md` §3 |
 | E30 | InternalUseVoucher | Xuất dùng nội bộ (XN) | `01-tong-quan.md` §C4 |
 | E31 | WriteOffVoucher | Xuất hủy (XH) | `01-tong-quan.md` §C5 |
 

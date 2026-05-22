@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>So quy — QLBH</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;
+  --success:#16a34a;--success-light:#f0fdf4;
+  --warning:#d97706;--warning-light:#fffbeb;
+  --danger:#dc2626;--danger-light:#fef2f2;
+  --orange:#ea580c;--orange-light:#fff7ed;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;
+  --g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:var(--g100);color:var(--g800);display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:220px;background:#1e293b;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155}
+.sb-logo-icon{width:30px;height:30px;background:var(--primary);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.sb-logo-name{font-weight:700;color:#f1f5f9;font-size:14px}
+.nav-group{padding:6px 0}
+.nav-group-label{font-size:10.5px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em;padding:5px 14px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:background .12s}
+.nav-item:hover{background:#334155;color:#e2e8f0}
+.nav-item.active{background:#1d4ed8;color:#fff}
+.nav-item .ico{width:16px;text-align:center;font-size:14px;flex-shrink:0}
+.nav-item .lbl{flex:1}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--g200);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:15px;flex:1}
+.content{flex:1;overflow-y:auto;padding:18px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .12s}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-dark)}
+.btn-o{background:#fff;color:var(--g700);border:1px solid var(--g300)}.btn-o:hover{background:var(--g50)}
+.btn-g{background:var(--success);color:#fff}.btn-g:hover{background:#15803d}
+.btn-r{background:var(--danger);color:#fff}.btn-r:hover{background:#b91c1c}
+.btn-warn{background:var(--warning);color:#fff}
+.btn-s{padding:5px 10px;font-size:12px}
+.btn-icon{padding:5px 7px;border-radius:5px;border:1px solid var(--g200);background:#fff;cursor:pointer;color:var(--g500);font-size:13px}
+.btn-icon:hover{background:var(--g50)}
+.bg{display:flex;gap:8px;align-items:center}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi-card{background:#fff;border-radius:8px;padding:14px;border:1px solid var(--g200);border-top:3px solid var(--g200)}
+.kpi-card.green{border-top-color:var(--success)}
+.kpi-card.blue{border-top-color:var(--primary)}
+.kpi-card.purple{border-top-color:var(--purple)}
+.kpi-card.dark{border-top-color:var(--g700)}
+.kpi-lbl{font-size:12px;color:var(--g500);margin-bottom:3px}
+.kpi-sub-lbl{font-size:11px;color:var(--g400);margin-bottom:4px}
+.kpi-val{font-size:20px;font-weight:700;color:var(--g800)}
+.kpi-chg{font-size:11.5px;margin-top:3px;color:var(--g400)}
+
+/* So du bar */
+.sodu-bar{background:#fff;border-radius:8px;border:1px solid var(--g200);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:0}
+.sodu-item{flex:1;text-align:center;padding:0 12px;position:relative}
+.sodu-item+.sodu-item::before{content:'';position:absolute;left:0;top:10%;bottom:10%;width:1px;background:var(--g200)}
+.sodu-label{font-size:11px;color:var(--g500);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.sodu-val{font-size:18px;font-weight:700}
+.sodu-op{font-size:22px;color:var(--g300);font-weight:300;padding:0 8px;flex-shrink:0}
+.sodu-period{font-size:11px;color:var(--g400);margin-top:2px}
+
+/* Filter */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.filter-bar select,.filter-bar input{padding:6px 9px;border:1px solid var(--g300);border-radius:6px;font-size:13px;background:#fff;color:var(--g800)}
+.filter-bar input{min-width:200px}
+.srch-wrap{display:flex;align-items:center;gap:5px;border:1px solid var(--g300);border-radius:6px;padding:5px 9px;background:#fff}
+.srch-wrap input{border:none;outline:none;font-size:13px;width:180px}
+
+/* Table */
+.tbl-wrap{background:#fff;border-radius:8px;border:1px solid var(--g200);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--g50)}
+th{padding:9px 10px;text-align:left;font-size:11.5px;font-weight:600;color:var(--g500);border-bottom:1px solid var(--g200);white-space:nowrap}
+td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--g100);color:var(--g700);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.data-row:hover td{background:var(--g50);cursor:pointer}
+.nr{text-align:right;font-variant-numeric:tabular-nums}
+
+/* Badges */
+.b{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:11.5px;font-weight:500}
+.b-green{background:var(--success-light);color:var(--success)}
+.b-red{background:var(--danger-light);color:var(--danger)}
+.b-gray{background:var(--g100);color:var(--g600)}
+.b-blue{background:var(--primary-light);color:var(--primary)}
+.b-warn{background:var(--warning-light);color:var(--warning)}
+
+/* Loai thu/chi sub-badge */
+.sub-cat{font-size:11px;color:var(--g500);margin-top:2px;display:block}
+
+/* Source doc link */
+.src-link{color:var(--primary);text-decoration:none;font-size:12.5px;font-weight:500}
+.src-link:hover{text-decoration:underline}
+
+/* Amount */
+.amt-thu{color:var(--success);font-weight:600}
+.amt-chi{color:var(--danger);font-weight:600}
+.amt-neu{color:var(--g600);font-weight:500}
+
+/* Detail row */
+.detail-row{display:none}
+.detail-row td{background:#f0f7ff;padding:0;border-bottom:2px solid var(--primary-light)}
+.detail-inner{padding:14px 18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.detail-field label{font-size:10.5px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:2px}
+.detail-field p{font-size:13px;color:var(--g800)}
+.pair-link{display:inline-flex;align-items:center;gap:4px;background:var(--warning-light);color:var(--warning);padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* Table footer */
+.tbl-footer{padding:10px 14px;border-top:2px solid var(--g200);background:var(--g50);display:flex;gap:24px;align-items:center;font-size:13px}
+.tbl-footer .f-lbl{color:var(--g500);margin-right:4px}
+
+/* Cancel overlay */
+.cancelled{opacity:.5;text-decoration:line-through}
+
+/* Modal */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.mo-box{background:#fff;border-radius:10px;padding:22px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.mo-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.mo-close{cursor:pointer;font-size:18px;color:var(--g400);background:none;border:none;line-height:1}
+.form-row{margin-bottom:13px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--g600);margin-bottom:4px}
+.form-ctrl{width:100%;padding:7px 9px;border:1px solid var(--g300);border-radius:6px;font-size:13px;color:var(--g800)}
+.form-ctrl:focus{outline:none;border-color:var(--primary)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-hint{font-size:11px;color:var(--g400);margin-top:3px}
+.mo-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--g100)}
+.mo-section{font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--g100)}
+.amount-preview{background:var(--g50);border-radius:6px;padding:10px 12px;margin-top:6px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.amount-preview strong{font-size:17px}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">Q</div>
+    <div><div class="sb-logo-name">QLBH Pro</div></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Ban hang</div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#127968;</span><span class="lbl">Tong quan</span></div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#128203;</span><span class="lbl">Don hang</span></div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#128196;</span><span class="lbl">Hoa don</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Hang hoa</div>
+    <div class="nav-item" onclick="window.location.href='hang-hoa.html'"><span class="ico">&#128230;</span><span class="lbl">Hang hoa</span></div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#127970;</span><span class="lbl">Kho</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Doi tac</div>
+    <div class="nav-item" onclick="window.location.href='khach-hang.html'"><span class="ico">&#128101;</span><span class="lbl">Khach hang</span></div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#127968;</span><span class="lbl">Nha cung cap</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Nhan su</div>
+    <div class="nav-item" onclick="window.location.href='nhan-vien.html'"><span class="ico">&#128100;</span><span class="lbl">Nhan vien</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thuong mai</div>
+    <div class="nav-item" onclick="window.location.href='bang-gia-khuyen-mai.html'"><span class="ico">&#127991;&#65039;</span><span class="lbl">Bang gia &amp; KM</span></div>
+    <div class="nav-item" onclick="window.location.href='kenh-ban-hang.html'"><span class="ico">&#127760;</span><span class="lbl">Kenh ban hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Phan tich</div>
+    <div class="nav-item" onclick="window.location.href='bao-cao.html'"><span class="ico">&#128200;</span><span class="lbl">Bao cao</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Tai chinh</div>
+    <div class="nav-item active"><span class="ico">&#128181;</span><span class="lbl">So quy</span></div>
+    <div class="nav-item" onclick="window.location.href='thue-ke-toan.html'"><span class="ico">&#128196;</span><span class="lbl">Thue &amp; Ke toan</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">He thong</div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#128274;</span><span class="lbl">Nguoi dung &amp; Quyen</span></div>
+    <div class="nav-item" onclick="go()"><span class="ico">&#9881;&#65039;</span><span class="lbl">Cau hinh</span></div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">So quy</div>
+    <div class="bg">
+      <button class="btn btn-o btn-s" onclick="openMo('mo-chuyen-quy')">&#8644; Chuyen quy</button>
+      <button class="btn btn-r btn-s" onclick="openMo('mo-phieu-chi')">&#8722; Phieu chi</button>
+      <button class="btn btn-g btn-s" onclick="openMo('mo-phieu-thu')">+ Phieu thu</button>
+      <button class="btn btn-o btn-s">&#8595; Xuat Excel</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-lbl">Tien mat</div>
+        <div class="kpi-sub-lbl">Quay thu ngan</div>
+        <div class="kpi-val">12.450.000</div>
+        <div class="kpi-chg">So du hien tai</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-lbl">Ngan hang</div>
+        <div class="kpi-sub-lbl">VCB + Techcombank</div>
+        <div class="kpi-val">48.750.000</div>
+        <div class="kpi-chg">So du hien tai</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-lbl">Vi dien tu</div>
+        <div class="kpi-sub-lbl">MoMo + ZaloPay</div>
+        <div class="kpi-val">2.100.000</div>
+        <div class="kpi-chg">So du hien tai</div>
+      </div>
+      <div class="kpi-card dark">
+        <div class="kpi-lbl">Tong quy</div>
+        <div class="kpi-sub-lbl">Tat ca tai khoan</div>
+        <div class="kpi-val">63.300.000</div>
+        <div class="kpi-chg" style="color:var(--success)">&#9650; +1.590.000 hom nay</div>
+      </div>
+    </div>
+
+    <!-- So du dau ky / cuoi ky -->
+    <div class="sodu-bar">
+      <div class="sodu-item" style="text-align:left;padding-left:0">
+        <div class="sodu-label">So du dau ky</div>
+        <div class="sodu-val" style="color:var(--g700)">85.560.000</div>
+        <div class="sodu-period">01/05/2025</div>
+      </div>
+      <div class="sodu-op">+</div>
+      <div class="sodu-item">
+        <div class="sodu-label">Tong thu</div>
+        <div class="sodu-val" style="color:var(--success)">+17.190.000</div>
+        <div class="sodu-period">17 phieu thu</div>
+      </div>
+      <div class="sodu-op">&#8722;</div>
+      <div class="sodu-item">
+        <div class="sodu-label">Tong chi</div>
+        <div class="sodu-val" style="color:var(--danger)">&#8722;39.450.000</div>
+        <div class="sodu-period">12 phieu chi</div>
+      </div>
+      <div class="sodu-op">=</div>
+      <div class="sodu-item" style="text-align:right;padding-right:0">
+        <div class="sodu-label">So du cuoi ky</div>
+        <div class="sodu-val" style="color:var(--primary)">63.300.000</div>
+        <div class="sodu-period">21/05/2025 (hom nay)</div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <select id="sel-quy">
+        <option value="">Tat ca loai quy</option>
+        <option>Tien mat</option>
+        <option>VCB (Vietcombank)</option>
+        <option>Techcombank</option>
+        <option>MoMo</option>
+        <option>ZaloPay</option>
+      </select>
+      <select id="sel-loai">
+        <option value="">Tat ca loai GD</option>
+        <option>Phieu thu</option>
+        <option>Phieu chi</option>
+        <option>Chuyen quy</option>
+      </select>
+      <select id="sel-loaitc">
+        <option value="">Tat ca loai thu chi</option>
+        <optgroup label="Thu">
+          <option>Thu tien hoa don</option>
+          <option>Thu coc dat hang</option>
+          <option>Thu hoan tien tu NCC</option>
+          <option>Thu khac</option>
+        </optgroup>
+        <optgroup label="Chi">
+          <option>Chi hoan tien khach</option>
+          <option>Chi tra nha cung cap</option>
+          <option>Chi luong / tam ung</option>
+          <option>Chi van hanh</option>
+          <option>Chi khac</option>
+        </optgroup>
+        <optgroup label="Noi bo">
+          <option>Chuyen quy noi bo</option>
+        </optgroup>
+      </select>
+      <select id="sel-kqkd">
+        <option value="">Hach toan KQKD</option>
+        <option>Co</option>
+        <option>Khong</option>
+      </select>
+      <select id="sel-tg">
+        <option>Thang nay (T5/2025)</option>
+        <option>Hom nay</option>
+        <option>Hom qua</option>
+        <option>7 ngay qua</option>
+        <option>Thang truoc</option>
+        <option>Tuy chon...</option>
+      </select>
+      <select id="sel-tt">
+        <option value="">Tat ca trang thai</option>
+        <option>Da thanh toan</option>
+        <option>Da huy</option>
+      </select>
+      <div class="srch-wrap">&#128269;<input type="text" placeholder="Tim ma phieu, doi tac..."></div>
+    </div>
+
+    <!-- Table -->
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="chk-all"></th>
+            <th>Ma phieu</th>
+            <th>Thoi gian</th>
+            <th>Loai</th>
+            <th>Loai thu chi</th>
+            <th>Doi tac</th>
+            <th>Chung tu nguon</th>
+            <th>Loai quy</th>
+            <th>HT KQKD</th>
+            <th class="nr">Gia tri</th>
+            <th>Trang thai</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body">
+
+          <!-- Row 1: Thu hoa don — Tien mat -->
+          <tr class="data-row" onclick="toggleDetail('d1')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--success);font-weight:600">TTHD016580</td>
+            <td>21/05 11:35</td>
+            <td><span class="b b-green">Thu</span></td>
+            <td>Thu tien hoa don</td>
+            <td>Nguyen Thi Hoa</td>
+            <td><a class="src-link" href="#" onclick="event.stopPropagation()">HD016580</a></td>
+            <td>Tien mat</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-thu">+500.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" onclick="event.stopPropagation();openMo('mo-phieu-thu')" title="Sua">&#9998;</button><button class="btn-icon" onclick="event.stopPropagation()" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d1" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>TTHD016580</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Chung tu nguon</label><p><a class="src-link" href="#">HD016580</a> — Hoa don ban hang</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hinh thuc thu</label><p>Tien mat tai quay</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Nguyen Thi Hoa (KH-00234)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>Le Thu Huong (NV)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>21/05/2025 11:35:22</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p style="color:var(--g400)">— Khong co —</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--success)">Tien mat: +500.000<br>Du no KH: &#8722;500.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 2: Thu hoa don — Chuyen khoan -->
+          <tr class="data-row" onclick="toggleDetail('d2')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--success);font-weight:600">TTHD016579</td>
+            <td>21/05 10:17</td>
+            <td><span class="b b-green">Thu</span></td>
+            <td>Thu tien hoa don</td>
+            <td>Tran Van Minh</td>
+            <td><a class="src-link" href="#" onclick="event.stopPropagation()">HD016579</a></td>
+            <td>VCB</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-thu">+890.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d2" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>TTHD016579</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Chung tu nguon</label><p><a class="src-link" href="#">HD016579</a> — Hoa don ban hang</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hinh thuc thu</label><p>Chuyen khoan VietQR &#8212; VCB</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Tran Van Minh (KH-00891)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>He thong (auto)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>21/05/2025 10:17:08</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p style="color:var(--g400)">— Khong co —</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--success)">VCB: +890.000<br>Du no KH: &#8722;890.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 3: Thu coc dat hang -->
+          <tr class="data-row" onclick="toggleDetail('d3')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--success);font-weight:600">TTDH000124</td>
+            <td>21/05 09:52</td>
+            <td><span class="b b-green">Thu</span></td>
+            <td>Thu coc dat hang</td>
+            <td>Le Thi Hue</td>
+            <td><a class="src-link" href="#" onclick="event.stopPropagation()">DH000124</a></td>
+            <td>Tien mat</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-thu">+200.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d3" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>TTDH000124</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Chung tu nguon</label><p><a class="src-link" href="#">DH000124</a> — Don hang dat truoc</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Loai</label><p>Tien coc — chua phai doanh thu hoan thanh</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Le Thi Hue (KH-01122)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>Le Thu Huong (NV)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>21/05/2025 09:52:41</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>Coc truoc 30% don hang may do</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--success)">Tien mat: +200.000<br>Coc DH: +200.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 4: Thu hoan tien tu NCC (Tra hang nhap) -->
+          <tr class="data-row" onclick="toggleDetail('d4')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--success);font-weight:600">TTNCC000018</td>
+            <td>20/05 16:30</td>
+            <td><span class="b b-green">Thu</span></td>
+            <td>Thu hoan tien tu NCC</td>
+            <td>Cty CP Truong Son</td>
+            <td><a class="src-link" href="#" onclick="event.stopPropagation()">TPN000018</a></td>
+            <td>Techcombank</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-thu">+3.500.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d4" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>TTNCC000018</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Chung tu nguon</label><p><a class="src-link" href="#">TPN000018</a> — Phieu tra hang nhap</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Cty CP Truong Son (NCC-0021)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>He thong (auto)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>20/05/2025 16:30:15</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>NCC hoan tien do hang loi lo 14 san pham</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--success)">Techcombank: +3.500.000<br>Du no NCC: &#8722;3.500.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 5: Chi hoan tien khach -->
+          <tr class="data-row" onclick="toggleDetail('d5')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--danger);font-weight:600">TTTH000044</td>
+            <td>21/05 09:45</td>
+            <td><span class="b b-red">Chi</span></td>
+            <td>Chi hoan tien khach</td>
+            <td>Pham Thi Thu</td>
+            <td><a class="src-link" href="#" onclick="event.stopPropagation()">TH000044</a></td>
+            <td>Tien mat</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-chi">&#8722;350.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d5" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>TTTH000044</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Chung tu nguon</label><p><a class="src-link" href="#">TH000044</a> — Phieu tra hang</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Pham Thi Thu (KH-00567)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>He thong (auto)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>21/05/2025 09:45:33</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>Khach tra hang loi, hoan tien mat</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--danger)">Tien mat: &#8722;350.000<br>Du no KH: +350.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 6: Chi tra NCC -->
+          <tr class="data-row" onclick="toggleDetail('d6')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--danger);font-weight:600">CHNCC000031</td>
+            <td>20/05 14:00</td>
+            <td><span class="b b-red">Chi</span></td>
+            <td>Chi tra nha cung cap</td>
+            <td>Cty CP Truong Son</td>
+            <td><a class="src-link" href="#" onclick="event.stopPropagation()">PN000234</a></td>
+            <td>Techcombank</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-chi">&#8722;15.000.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d6" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>CHNCC000031</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Chung tu nguon</label><p><a class="src-link" href="#">PN000234</a> — Phieu nhap hang</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Cty CP Truong Son (NCC-0021)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>Nguyen Van An (QTR)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>20/05/2025 14:00:12</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>TT con lai PN234 (da coc 5tr truoc)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--danger)">Techcombank: &#8722;15.000.000<br>Du no NCC: &#8722;15.000.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 7: Chi luong -->
+          <tr class="data-row" onclick="toggleDetail('d7')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--danger);font-weight:600">CHLNG000012</td>
+            <td>20/05 10:00</td>
+            <td><span class="b b-red">Chi</span></td>
+            <td>Chi luong / tam ung</td>
+            <td>Nguyen Van An</td>
+            <td style="color:var(--g400)">—</td>
+            <td>Tien mat</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-chi">&#8722;8.500.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" onclick="event.stopPropagation()" title="Sua">&#9998;</button><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d7" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>CHLNG000012</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Loai chi</label><p>Chi luong thang 5/2025</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Nguyen Van An (NV-0003)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>Nguyen Van An (QTR)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>20/05/2025 10:00:00</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>Luong thang 5 — giai ngan tien mat</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--danger)">Tien mat: &#8722;8.500.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 8: Chi van hanh -->
+          <tr class="data-row" onclick="toggleDetail('d8')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--danger);font-weight:600">CHVH000089</td>
+            <td>19/05 08:30</td>
+            <td><span class="b b-red">Chi</span></td>
+            <td>Chi van hanh</td>
+            <td>Dien luc TP.HCM</td>
+            <td style="color:var(--g400)">—</td>
+            <td>VCB</td>
+            <td><span class="b b-blue">Co</span></td>
+            <td class="nr amt-chi">&#8722;2.300.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" onclick="event.stopPropagation()" title="Sua">&#9998;</button><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d8" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>CHVH000089</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Loai chi</label><p>Chi phi van hanh — tien dien</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Doi tac</label><p>Dien luc TP.HCM (EVN)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi tao</label><p>Nguyen Van An (QTR)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Thoi gian tao</label><p>19/05/2025 08:30:55</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>Hoa don tien dien thang 5 — CS 219384</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--danger)">VCB: &#8722;2.300.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 9: Chuyen quy CNH -->
+          <tr class="data-row" onclick="toggleDetail('d9')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--g600);font-weight:600">CNH000013</td>
+            <td>20/05 17:00</td>
+            <td><span class="b b-gray">Chuyen quy</span></td>
+            <td>Chuyen quy noi bo</td>
+            <td style="color:var(--g400)">—</td>
+            <td style="color:var(--g400)">—</td>
+            <td>TM &#8594; VCB</td>
+            <td><span class="b b-gray">Khong</span></td>
+            <td class="nr amt-neu">5.000.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d9" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>CNH000013 (Phieu chi)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Quy nguon</label><p>Tien mat &#8594; giam 5.000.000</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Phieu doi ung</label>
+                  <p><span class="pair-link" onclick="toggleDetail('d10');document.getElementById('d10').scrollIntoView({behavior:'smooth'})">&#8644; TTD_CNH000013</span></p>
+                </div>
+                <div class="detail-field" style="margin-top:8px"><label>Quy dich</label><p>VCB &#8594; tang 5.000.000</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>Nap tien mat vao TK VCB cuoi ngay</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Hieu ung quy</label><p style="color:var(--g600)">Tong quy: khong doi<br>Tien mat: &#8722;5.000.000<br>VCB: +5.000.000</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 10: TTD_CNH doi ung -->
+          <tr class="data-row" onclick="toggleDetail('d10')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td style="color:var(--g600);font-weight:600">TTD_CNH000013</td>
+            <td>20/05 17:00</td>
+            <td><span class="b b-gray">Chuyen quy</span></td>
+            <td>Chuyen quy noi bo</td>
+            <td style="color:var(--g400)">—</td>
+            <td style="color:var(--g400)">—</td>
+            <td>VCB (nhan)</td>
+            <td><span class="b b-gray">Khong</span></td>
+            <td class="nr amt-neu">5.000.000</td>
+            <td><span class="b b-green">Da TT</span></td>
+            <td><div class="bg"><button class="btn-icon" title="In">&#128424;</button></div></td>
+          </tr>
+          <tr id="d10" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p>TTD_CNH000013 (Phieu thu doi ung)</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Quy nhan</label><p>VCB &#8594; tang 5.000.000</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Phieu doi ung</label>
+                  <p><span class="pair-link" onclick="toggleDetail('d9');document.getElementById('d9').scrollIntoView({behavior:'smooth'})">&#8644; CNH000013</span></p>
+                </div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ghi chu</label><p>Nap tien mat vao TK VCB cuoi ngay</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+          <!-- Row 11: Da huy -->
+          <tr class="data-row" onclick="toggleDetail('d11')">
+            <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+            <td class="cancelled" style="color:var(--g400)">TTTH000043</td>
+            <td class="cancelled" style="color:var(--g400)">19/05 15:20</td>
+            <td><span class="b b-red">Chi</span></td>
+            <td class="cancelled" style="color:var(--g400)">Chi hoan tien khach</td>
+            <td class="cancelled" style="color:var(--g400)">Hoang Van Duc</td>
+            <td class="cancelled"><a class="src-link" style="color:var(--g400)" href="#" onclick="event.stopPropagation()">TH000043</a></td>
+            <td class="cancelled" style="color:var(--g400)">Tien mat</td>
+            <td class="cancelled"><span class="b b-gray">Co</span></td>
+            <td class="nr cancelled" style="color:var(--g400)">&#8722;120.000</td>
+            <td><span class="b b-gray">Da huy</span></td>
+            <td><div class="bg"><button class="btn-icon" title="Xem ly do huy" onclick="event.stopPropagation()">&#128065;</button></div></td>
+          </tr>
+          <tr id="d11" class="detail-row"><td colspan="12">
+            <div class="detail-inner">
+              <div>
+                <div class="detail-field"><label>Ma chung tu</label><p style="text-decoration:line-through;color:var(--g400)">TTTH000043</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Trang thai</label><p style="color:var(--danger);font-weight:600">&#10006; Da huy</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Ly do huy</label><p>Nhap sai — khach chua nhan tien</p></div>
+                <div class="detail-field" style="margin-top:8px"><label>Nguoi huy</label><p>Nguyen Van An (QTR) — 19/05 15:45</p></div>
+              </div>
+              <div>
+                <div class="detail-field"><label>Hieu ung dao nguoc</label><p style="color:var(--g500)">Tien mat: khoi phuc +120.000<br>Du no KH: dao nguoc</p></div>
+              </div>
+            </div>
+          </td></tr>
+
+        </tbody>
+      </table>
+
+      <!-- Table footer -->
+      <div class="tbl-footer">
+        <span><span class="f-lbl">Thu (KQKD):</span><strong style="color:var(--success)">+17.190.000</strong></span>
+        <span><span class="f-lbl">Chi (KQKD):</span><strong style="color:var(--danger)">&#8722;39.450.000</strong></span>
+        <span style="color:var(--g400)"><span class="f-lbl">Chuyen quy noi bo:</span>&#177;5.000.000</span>
+        <span style="margin-left:auto"><span class="f-lbl">So du cuoi ky:</span><strong style="font-size:15px;color:var(--primary)">63.300.000</strong></span>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ===== MODAL: Tao Phieu thu ===== -->
+<div id="mo-phieu-thu" class="mo">
+  <div class="mo-box">
+    <div class="mo-title">
+      <span>&#43; Tao Phieu thu</span>
+      <button class="mo-close" onclick="closeMo('mo-phieu-thu')">&#10005;</button>
+    </div>
+    <div class="mo-section">Thong tin giao dich</div>
+    <div class="form-row">
+      <label class="form-label">Loai thu <span style="color:var(--danger)">*</span></label>
+      <select class="form-ctrl" id="loai-thu-sel" onchange="toggleSrcField('thu')">
+        <option value="">— Chon loai thu —</option>
+        <option value="hoadon">Thu tien hoa don (TTHD)</option>
+        <option value="datcoc">Thu coc dat hang (TTDH)</option>
+        <option value="ncc">Thu hoan tien tu NCC (TTNCC)</option>
+        <option value="khac">Thu khac</option>
+      </select>
+    </div>
+    <div id="src-thu-row" class="form-row" style="display:none">
+      <label class="form-label" id="src-thu-lbl">Hoa don lien ket</label>
+      <input class="form-ctrl" id="src-thu-inp" placeholder="Tim ma hoa don / don hang...">
+      <div class="form-hint">He thong se tu dong tao ma phieu tuong ung</div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">Doi tac <span style="color:var(--danger)">*</span></label>
+        <input class="form-ctrl" placeholder="Tim khach hang, NCC...">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Ngay giao dich <span style="color:var(--danger)">*</span></label>
+        <input class="form-ctrl" type="date" value="2025-05-21">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Loai quy <span style="color:var(--danger)">*</span></label>
+      <select class="form-ctrl">
+        <option>Tien mat (Quay thu ngan)</option>
+        <option>VCB (Vietcombank ****1234)</option>
+        <option>Techcombank (****5678)</option>
+        <option>MoMo</option>
+        <option>ZaloPay</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Gia tri thu (VND) <span style="color:var(--danger)">*</span></label>
+      <input class="form-ctrl" type="number" placeholder="0" id="thu-amount" oninput="updatePreview('thu-preview','thu-amount','thu')">
+      <div class="amount-preview">
+        <span style="color:var(--g500)">Tong thu vao quy</span>
+        <strong id="thu-preview" style="color:var(--success)">0 &#8363;</strong>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Hach toan KQKD</label>
+      <select class="form-ctrl">
+        <option value="co">Co — anh huong lai/lo</option>
+        <option value="khong">Khong — chi la dong tien</option>
+      </select>
+      <div class="form-hint">Thu hoa don / Thu coc / Thu NCC = Co. Chuyen von vao = Khong.</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Ghi chu</label>
+      <textarea class="form-ctrl" rows="2" placeholder="Ghi chu them (tuy chon)..."></textarea>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-o" onclick="closeMo('mo-phieu-thu')">Huy</button>
+      <button class="btn btn-o">Luu nhap</button>
+      <button class="btn btn-g">Xac nhan &amp; Luu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Tao Phieu chi ===== -->
+<div id="mo-phieu-chi" class="mo">
+  <div class="mo-box">
+    <div class="mo-title">
+      <span>&#8722; Tao Phieu chi</span>
+      <button class="mo-close" onclick="closeMo('mo-phieu-chi')">&#10005;</button>
+    </div>
+    <div class="mo-section">Thong tin giao dich</div>
+    <div class="form-row">
+      <label class="form-label">Loai chi <span style="color:var(--danger)">*</span></label>
+      <select class="form-ctrl" id="loai-chi-sel" onchange="toggleSrcField('chi')">
+        <option value="">— Chon loai chi —</option>
+        <option value="hoan">Chi hoan tien khach (TTTH)</option>
+        <option value="ncc">Chi tra nha cung cap (CHNCC)</option>
+        <option value="luong">Chi luong / tam ung (CHLNG)</option>
+        <option value="vanhanh">Chi van hanh (CHVH)</option>
+        <option value="khac">Chi khac</option>
+      </select>
+    </div>
+    <div id="src-chi-row" class="form-row" style="display:none">
+      <label class="form-label" id="src-chi-lbl">Phieu tra hang lien ket</label>
+      <input class="form-ctrl" id="src-chi-inp" placeholder="Tim ma phieu tra hang / phieu nhap...">
+      <div class="form-hint">He thong se tu dong cap nhat du no doi tac</div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">Doi tac <span style="color:var(--danger)">*</span></label>
+        <input class="form-ctrl" placeholder="Tim khach hang, NCC, nhan vien...">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Ngay giao dich <span style="color:var(--danger)">*</span></label>
+        <input class="form-ctrl" type="date" value="2025-05-21">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Loai quy <span style="color:var(--danger)">*</span></label>
+      <select class="form-ctrl">
+        <option>Tien mat (Quay thu ngan)</option>
+        <option>VCB (Vietcombank ****1234)</option>
+        <option>Techcombank (****5678)</option>
+        <option>MoMo</option>
+        <option>ZaloPay</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Gia tri chi (VND) <span style="color:var(--danger)">*</span></label>
+      <input class="form-ctrl" type="number" placeholder="0" id="chi-amount" oninput="updatePreview('chi-preview','chi-amount','chi')">
+      <div class="amount-preview">
+        <span style="color:var(--g500)">Tong xuat khoi quy</span>
+        <strong id="chi-preview" style="color:var(--danger)">0 &#8363;</strong>
+      </div>
+    </div>
+    <div id="approval-hint" class="form-row" style="display:none">
+      <div style="background:var(--warning-light);border:1px solid #fde68a;border-radius:6px;padding:10px 12px;font-size:12px;color:#92400e">
+        &#9888;&#65039; <strong>Phieu chi vuot nguong 10.000.000 VND</strong> — can quan ly phe duyet truoc khi giai ngan.
+        <br>Trang thai: <strong>Cho duyet</strong> — gui yeu cau phe duyet sau khi luu.
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Hach toan KQKD</label>
+      <select class="form-ctrl">
+        <option value="co">Co — anh huong lai/lo</option>
+        <option value="khong">Khong — chi la dong tien</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Ghi chu</label>
+      <textarea class="form-ctrl" rows="2" placeholder="Ghi chu them (tuy chon)..."></textarea>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-o" onclick="closeMo('mo-phieu-chi')">Huy</button>
+      <button class="btn btn-o">Luu nhap</button>
+      <button class="btn btn-r">Xac nhan &amp; Luu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Chuyen quy ===== -->
+<div id="mo-chuyen-quy" class="mo">
+  <div class="mo-box" style="width:440px">
+    <div class="mo-title">
+      <span>&#8644; Chuyen quy noi bo</span>
+      <button class="mo-close" onclick="closeMo('mo-chuyen-quy')">&#10005;</button>
+    </div>
+    <div style="background:var(--g50);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--g600);margin-bottom:16px">
+      Chuyen quy se tao <strong>2 phieu doi ung</strong> (CNH + TTD_CNH) dong thoi. Tong quy <strong>khong thay doi</strong>, chi thay doi co cau giua cac tai khoan.
+    </div>
+    <div class="form-row">
+      <label class="form-label">Quy nguon (tien di ra) <span style="color:var(--danger)">*</span></label>
+      <select class="form-ctrl" id="quy-nguon">
+        <option value="">— Chon quy nguon —</option>
+        <option>Tien mat — So du: 12.450.000</option>
+        <option>VCB ****1234 — So du: 38.200.000</option>
+        <option>Techcombank ****5678 — So du: 10.550.000</option>
+        <option>MoMo — So du: 1.400.000</option>
+        <option>ZaloPay — So du: 700.000</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Quy dich (tien di vao) <span style="color:var(--danger)">*</span></label>
+      <select class="form-ctrl" id="quy-dich">
+        <option value="">— Chon quy dich —</option>
+        <option>Tien mat — So du: 12.450.000</option>
+        <option>VCB ****1234 — So du: 38.200.000</option>
+        <option>Techcombank ****5678 — So du: 10.550.000</option>
+        <option>MoMo — So du: 1.400.000</option>
+        <option>ZaloPay — So du: 700.000</option>
+      </select>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">So tien <span style="color:var(--danger)">*</span></label>
+        <input class="form-ctrl" type="number" placeholder="0" id="cq-amount" oninput="updatePreview('cq-preview','cq-amount','cq')">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Ngay chuyen <span style="color:var(--danger)">*</span></label>
+        <input class="form-ctrl" type="date" value="2025-05-21">
+      </div>
+    </div>
+    <div class="amount-preview" style="margin-bottom:14px">
+      <span style="color:var(--g500)">Gia tri chuyen</span>
+      <strong id="cq-preview" style="color:var(--g700)">0 &#8363;</strong>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Ghi chu</label>
+      <textarea class="form-ctrl" rows="2" placeholder="Ly do chuyen quy..."></textarea>
+    </div>
+    <div style="background:var(--g50);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--g500);margin-bottom:4px">
+      Luong phat sinh: <strong>CNH + TTD_CNH</strong> | Hach toan KQKD: <strong>Khong</strong>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-o" onclick="closeMo('mo-chuyen-quy')">Huy</button>
+      <button class="btn btn-p">Xac nhan chuyen quy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(){window.location.href='index.html';}
+
+function toggleDetail(id){
+  const row=document.getElementById(id);
+  if(!row)return;
+  const isOpen=row.style.display==='table-row';
+  // Close all
+  document.querySelectorAll('.detail-row').forEach(r=>r.style.display='none');
+  if(!isOpen)row.style.display='table-row';
+}
+
+function openMo(id){document.getElementById(id).classList.add('open');}
+function closeMo(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(o=>{
+  o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
+function toggleSrcField(type){
+  if(type==='thu'){
+    const val=document.getElementById('loai-thu-sel').value;
+    const row=document.getElementById('src-thu-row');
+    const lbl=document.getElementById('src-thu-lbl');
+    const inp=document.getElementById('src-thu-inp');
+    if(val==='hoadon'){row.style.display='';lbl.textContent='Hoa don lien ket';inp.placeholder='Tim ma hoa don (HD...)...';}
+    else if(val==='datcoc'){row.style.display='';lbl.textContent='Don hang lien ket';inp.placeholder='Tim ma don hang (DH...)...';}
+    else if(val==='ncc'){row.style.display='';lbl.textContent='Phieu tra hang nhap';inp.placeholder='Tim ma phieu tra hang nhap (TPN...)...';}
+    else{row.style.display='none';}
+  } else {
+    const val=document.getElementById('loai-chi-sel').value;
+    const row=document.getElementById('src-chi-row');
+    const lbl=document.getElementById('src-chi-lbl');
+    const inp=document.getElementById('src-chi-inp');
+    if(val==='hoan'){row.style.display='';lbl.textContent='Phieu tra hang lien ket';inp.placeholder='Tim ma phieu tra hang (TH...)...';}
+    else if(val==='ncc'){row.style.display='';lbl.textContent='Phieu nhap hang lien ket';inp.placeholder='Tim ma phieu nhap (PN...)...';}
+    else{row.style.display='none';}
+    // Approval hint for luong
+    const hint=document.getElementById('approval-hint');
+    if(val==='luong')hint.style.display='';else hint.style.display='none';
+  }
+}
+
+function updatePreview(previewId,inputId,type){
+  const val=parseInt(document.getElementById(inputId).value)||0;
+  const fmt=val.toLocaleString('vi-VN');
+  const el=document.getElementById(previewId);
+  if(type==='chi') el.textContent='−'+fmt+' ₫';
+  else el.textContent='+'+fmt+' ₫';
+  // Show approval hint if chi > 10M
+  if(type==='chi'){
+    const hint=document.getElementById('approval-hint');
+    if(val>=10000000)hint.style.display='';
+    else{const loai=document.getElementById('loai-chi-sel').value;if(loai!=='luong')hint.style.display='none';}
+  }
+}
+
+document.getElementById('chk-all').addEventListener('change',function(){
+  document.querySelectorAll('#tbl-body input[type=checkbox]').forEach(c=>c.checked=this.checked);
+});
+</script>
+</body>
+</html>

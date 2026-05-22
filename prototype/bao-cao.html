@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bao cao — Quan ly ban hang</title>
+<style>
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--success:#16a34a;--success-light:#f0fdf4;--warning:#d97706;--warning-light:#fffbeb;--danger:#dc2626;--danger-light:#fef2f2;--orange:#ea580c;--orange-light:#fff7ed;--purple:#7c3aed;--purple-light:#f5f3ff;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:var(--g800);background:var(--g50)}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;background:#1e293b;color:#cbd5e1;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155}
+.sb-logo-icon{width:30px;height:30px;background:var(--primary);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.sb-logo-name{font-weight:700;color:#f1f5f9;font-size:14px}.sb-logo-sub{font-size:11px;color:#64748b}
+.nav-group{padding:6px 0}.nav-group-label{font-size:10.5px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em;padding:5px 14px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:background .12s}
+.nav-item:hover{background:#334155;color:#e2e8f0}.nav-item.active{background:#1d4ed8;color:#fff}
+.nav-item .ico{width:16px;text-align:center;font-size:14px;flex-shrink:0}.nav-item .lbl{flex:1}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--g200);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:15px;flex:1}
+.tb-branch{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--g200);border-radius:6px;cursor:pointer;color:var(--g600);font-size:13px}
+.tb-user{display:flex;align-items:center;gap:7px;cursor:pointer}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0}
+/* TWO-PANEL LAYOUT */
+.rpt-layout{display:flex;height:100%;overflow:hidden}
+.rpt-sidebar{width:200px;background:#fff;border-right:1px solid var(--g200);overflow-y:auto;flex-shrink:0;padding:8px 0}
+.rpt-content{flex:1;overflow-y:auto;padding:18px}
+.rpt-group{margin-bottom:8px}
+.rpt-group-label{font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;padding:6px 14px 4px}
+.rpt-item{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--g600);cursor:pointer;font-size:13px;transition:background .12s}
+.rpt-item:hover{background:var(--g50);color:var(--g800)}
+.rpt-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.rpt-item .ico{font-size:14px;flex-shrink:0}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.ph h2{font-size:17px;font-weight:700}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi-card{background:#fff;border-radius:10px;padding:14px;border:1px solid var(--g200)}
+.kpi-lbl{font-size:12px;color:var(--g500);margin-bottom:4px}.kpi-val{font-size:21px;font-weight:700}
+.kpi-chg{font-size:11.5px;margin-top:3px}.up{color:var(--success)}.down{color:var(--danger)}
+.tc{background:#fff;border-radius:10px;border:1px solid var(--g200);margin-bottom:14px}
+.tc-head{padding:12px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--g200)}
+.tc-head h3{font-size:13.5px;font-weight:600;flex:1}
+table{width:100%;border-collapse:collapse}
+th{background:var(--g50);padding:9px 11px;text-align:left;font-size:11.5px;font-weight:600;color:var(--g500);border-bottom:1px solid var(--g200)}
+td{padding:9px 11px;border-bottom:1px solid var(--g100);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}.cr:hover td{background:var(--g50);cursor:pointer}
+.nr{text-align:right;font-variant-numeric:tabular-nums}
+.b{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:11.5px;font-weight:500}
+.b-blue{background:var(--primary-light);color:var(--primary)}.b-green{background:var(--success-light);color:var(--success)}
+.b-orange{background:var(--orange-light);color:var(--orange)}.b-red{background:var(--danger-light);color:var(--danger)}
+.b-gray{background:var(--g100);color:var(--g600)}.b-purple{background:var(--purple-light);color:var(--purple)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .12s}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-dark)}
+.btn-o{background:#fff;color:var(--g700);border:1px solid var(--g300)}.btn-o:hover{background:var(--g50)}
+.btn-s{padding:4px 9px;font-size:12px}.bg{display:flex;gap:7px;flex-wrap:wrap}
+.fb{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--g200);flex-wrap:wrap}
+.fb select,.fb input[type=text]{padding:5px 9px;border:1px solid var(--g300);border-radius:6px;font-size:12.5px;color:var(--g700);background:#fff;outline:none}
+.chart{height:180px;background:linear-gradient(135deg,#dbeafe,#eff6ff);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:12.5px;position:relative;overflow:hidden}
+.chart-bars{position:absolute;bottom:0;left:0;right:0;height:130px;display:flex;align-items:flex-end;padding:0 16px;gap:8px}
+.bar{flex:1;border-radius:4px 4px 0 0;min-width:0;transition:opacity .12s}
+.bar:hover{opacity:.8}
+.chart-label{font-size:11px;color:var(--g500);position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:4px 16px}
+.bar-lbl{font-size:10px;color:var(--g600);text-align:center}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.progress-bar{height:6px;background:var(--g200);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo"><div class="sb-logo-icon">KV</div><div><div class="sb-logo-name">KiotViet</div><div class="sb-logo-sub">Quan ly ban hang</div></div></div>
+  <div class="nav-group">
+    <div class="nav-item" onclick="go('dashboard')"><span class="ico">&#128202;</span><span class="lbl">Tong quan</span></div>
+    <div class="nav-item" onclick="window.open('pos.html')"><span class="ico">&#128717;</span><span class="lbl">Ban hang (POS)</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Don hang</div>
+    <div class="nav-item" onclick="go('don-hang')"><span class="ico">&#128203;</span><span class="lbl">Dat hang</span></div>
+    <div class="nav-item" onclick="go('hoa-don')"><span class="ico">&#129534;</span><span class="lbl">Hoa don</span></div>
+    <div class="nav-item" onclick="go('tra-hang')"><span class="ico">&#8617;&#65039;</span><span class="lbl">Tra hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Hang hoa &amp; Kho</div>
+    <div class="nav-item" onclick="window.location.href='hang-hoa.html'"><span class="ico">&#128230;</span><span class="lbl">Hang hoa</span></div>
+    <div class="nav-item" onclick="go('ton-kho')"><span class="ico">&#127981;</span><span class="lbl">Kho hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Mua hang</div>
+    <div class="nav-item" onclick="go('dat-hang-nhap')"><span class="ico">&#128233;</span><span class="lbl">Dat hang nhap</span></div>
+    <div class="nav-item" onclick="go('nhap-hang')"><span class="ico">&#128229;</span><span class="lbl">Nhap hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Khach hang &amp; Tai chinh</div>
+    <div class="nav-item" onclick="window.location.href='khach-hang.html'"><span class="ico">&#128101;</span><span class="lbl">Khach hang</span></div>
+    <div class="nav-item" onclick="go('so-quy')"><span class="ico">&#128176;</span><span class="lbl">So quy</span></div>
+    <div class="nav-item" onclick="go('giao-van')"><span class="ico">&#128666;</span><span class="lbl">Giao van</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Nhan su</div>
+    <div class="nav-item" onclick="window.location.href='nhan-vien.html'"><span class="ico">&#128100;</span><span class="lbl">Nhan vien</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thuong mai</div>
+    <div class="nav-item" onclick="window.location.href='bang-gia-khuyen-mai.html'"><span class="ico">&#127991;&#65039;</span><span class="lbl">Bang gia &amp; KM</span></div>
+    <div class="nav-item" onclick="window.location.href='kenh-ban-hang.html'"><span class="ico">&#127760;</span><span class="lbl">Kenh ban hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Phan tich</div>
+    <div class="nav-item active"><span class="ico">&#128200;</span><span class="lbl">Bao cao</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Tai chinh</div>
+    <div class="nav-item" onclick="window.location.href='thue-ke-toan.html'"><span class="ico">&#128196;</span><span class="lbl">Thue &amp; Ke toan</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thiet lap</div>
+    <div class="nav-item" onclick="go('nguoi-dung')"><span class="ico">&#128274;</span><span class="lbl">Nguoi dung &amp; Quyen</span></div>
+    <div class="nav-item" onclick="go('cau-hinh')"><span class="ico">&#9881;&#65039;</span><span class="lbl">Cau hinh</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Bao cao</div>
+    <div class="tb-branch">&#128205; Tat ca chi nhanh &#9660;</div>
+    <div style="color:var(--g300)">|</div>
+    <div class="tb-user"><div class="avatar">SH</div><span style="font-size:12.5px;color:var(--g600)">shiptest &#9660;</span></div>
+  </div>
+  <!-- TWO-PANEL: report list left, content right -->
+  <div class="rpt-layout">
+    <!-- LEFT: Report navigation -->
+    <div class="rpt-sidebar">
+      <div class="rpt-group">
+        <div class="rpt-group-label">Ban hang</div>
+        <div class="rpt-item active" onclick="showRpt('r-bh-tongquan',this)"><span class="ico">&#128202;</span>Tong quan doanh thu</div>
+        <div class="rpt-item" onclick="showRpt('r-bh-nv',this)"><span class="ico">&#128100;</span>Theo nhan vien</div>
+        <div class="rpt-item" onclick="showRpt('r-bh-kenh',this)"><span class="ico">&#127760;</span>Theo kenh ban</div>
+        <div class="rpt-item" onclick="showRpt('r-bh-gio',this)"><span class="ico">&#128336;</span>Theo gio (heat map)</div>
+      </div>
+      <div class="rpt-group">
+        <div class="rpt-group-label">Loi nhuan</div>
+        <div class="rpt-item" onclick="showRpt('r-ln',this)"><span class="ico">&#128181;</span>Loi nhuan gop</div>
+        <div class="rpt-item" onclick="showRpt('r-pl',this)"><span class="ico">&#128196;</span>P&amp;L summary</div>
+      </div>
+      <div class="rpt-group">
+        <div class="rpt-group-label">Hang hoa</div>
+        <div class="rpt-item" onclick="showRpt('r-hh-banchay',this)"><span class="ico">&#128293;</span>Hang ban chay</div>
+        <div class="rpt-item" onclick="showRpt('r-hh-tonkho',this)"><span class="ico">&#128230;</span>Ton kho</div>
+        <div class="rpt-item" onclick="showRpt('r-hh-chettam',this)"><span class="ico">&#128564;</span>Ton chet / cham</div>
+      </div>
+      <div class="rpt-group">
+        <div class="rpt-group-label">Khach hang</div>
+        <div class="rpt-item" onclick="showRpt('r-kh-retain',this)"><span class="ico">&#128101;</span>Retention / RFM</div>
+        <div class="rpt-item" onclick="showRpt('r-kh-congno',this)"><span class="ico">&#128178;</span>Cong no KH (AR)</div>
+      </div>
+      <div class="rpt-group">
+        <div class="rpt-group-label">Nhan vien</div>
+        <div class="rpt-item" onclick="showRpt('r-nv',this)"><span class="ico">&#128084;</span>Hieu suat NV</div>
+      </div>
+      <div class="rpt-group">
+        <div class="rpt-group-label">Tai chinh</div>
+        <div class="rpt-item" onclick="showRpt('r-tc',this)"><span class="ico">&#128176;</span>So quy &amp; Cash flow</div>
+        <div class="rpt-item" onclick="showRpt('r-ncc',this)"><span class="ico">&#128233;</span>Cong no NCC (AP)</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Report content -->
+    <div class="rpt-content">
+
+      <!-- BAO CAO: DOANH THU TONG QUAN -->
+      <div id="r-bh-tongquan" class="rpt-view">
+        <div class="ph">
+          <h2>Bao cao doanh thu</h2>
+          <div class="bg">
+            <select style="padding:5px 9px;border:1px solid var(--g300);border-radius:6px;font-size:12.5px"><option>Thang nay</option><option>Thang truoc</option><option>Quy nay</option><option>Nam nay</option><option>Tuy chinh</option></select>
+            <select style="padding:5px 9px;border:1px solid var(--g300);border-radius:6px;font-size:12.5px"><option>Tat ca chi nhanh</option><option>Chi nhanh 1</option><option>Chi nhanh 2</option></select>
+            <button class="btn btn-o btn-s">Xuat Excel</button>
+            <button class="btn btn-o btn-s">Xuat PDF</button>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-lbl">Doanh thu thuan</div><div class="kpi-val">284.500.000d</div><div class="kpi-chg up">&#8593; 14.2% so thang truoc</div></div>
+          <div class="kpi-card"><div class="kpi-lbl">So hoa don</div><div class="kpi-val">1.287</div><div class="kpi-chg up">&#8593; 87 don</div></div>
+          <div class="kpi-card"><div class="kpi-lbl">Gia tri TB / HD</div><div class="kpi-val">221.000d</div><div class="kpi-chg down">&#8595; 2.1% so thang truoc</div></div>
+          <div class="kpi-card"><div class="kpi-lbl">Ty le tra hang</div><div class="kpi-val">2.3%</div><div class="kpi-chg up">&#8595; 0.4% (tot hon)</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="tc">
+            <div class="tc-head"><h3>Doanh thu 30 ngay gan nhat</h3><span style="font-size:12px;color:var(--g500)">So sanh cung ky thang truoc</span></div>
+            <div style="padding:10px">
+              <div class="chart">
+                <div class="chart-bars">
+                  <div class="bar-wrap"><div class="bar" style="height:60%;background:#bfdbfe"></div><div class="bar-lbl">1</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:45%;background:#bfdbfe"></div><div class="bar-lbl">2</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:80%;background:#3b82f6"></div><div class="bar-lbl">3</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:65%;background:#bfdbfe"></div><div class="bar-lbl">4</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:90%;background:#3b82f6"></div><div class="bar-lbl">5</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:55%;background:#bfdbfe"></div><div class="bar-lbl">6</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:100%;background:#1d4ed8"></div><div class="bar-lbl">7</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:70%;background:#3b82f6"></div><div class="bar-lbl">8</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:75%;background:#3b82f6"></div><div class="bar-lbl">9</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:50%;background:#bfdbfe"></div><div class="bar-lbl">10</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:85%;background:#3b82f6"></div><div class="bar-lbl">...</div></div>
+                  <div class="bar-wrap"><div class="bar" style="height:95%;background:#1d4ed8"></div><div class="bar-lbl">21</div></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;justify-content:center;margin-top:8px;font-size:11.5px">
+                <span><span style="display:inline-block;width:12px;height:12px;background:#1d4ed8;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Thang nay</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:#bfdbfe;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Thang truoc</span>
+              </div>
+            </div>
+          </div>
+          <div class="tc">
+            <div class="tc-head"><h3>Phan khuc doanh thu</h3></div>
+            <div style="padding:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:13px">Truc tiep POS</span>
+                <span style="font-weight:600;color:var(--primary)">68.4%</span>
+              </div>
+              <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill" style="width:68%;background:#2563eb"></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:13px">TikTok Shop</span>
+                <span style="font-weight:600;color:#f97316">18.2%</span>
+              </div>
+              <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill" style="width:18%;background:#f97316"></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:13px">Shopee</span>
+                <span style="font-weight:600;color:#dc2626">9.1%</span>
+              </div>
+              <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill" style="width:9%;background:#dc2626"></div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:13px">Khac</span>
+                <span style="font-weight:600;color:var(--g500)">4.3%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:4%;background:#9ca3af"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="tc">
+          <div class="tc-head"><h3>Chi tiet theo ngay</h3></div>
+          <table>
+            <thead><tr><th>Ngay</th><th>Thu</th><th class="nr">Doanh thu thuan</th><th class="nr">So HD</th><th class="nr">GT TB/HD</th><th class="nr">Giam gia</th><th class="nr">Tra hang</th><th class="nr">Loi nhuan gop</th></tr></thead>
+            <tbody>
+              <tr><td>21/05/2026</td><td>Thu Tu</td><td class="nr" style="font-weight:600">8.245.000</td><td class="nr">47</td><td class="nr">175.426</td><td class="nr" style="color:var(--danger)">-420.000</td><td class="nr" style="color:var(--danger)">-0</td><td class="nr" style="color:var(--success)">3.298.000</td></tr>
+              <tr><td>20/05/2026</td><td>Thu Ba</td><td class="nr" style="font-weight:600">7.180.000</td><td class="nr">41</td><td class="nr">175.122</td><td class="nr" style="color:var(--danger)">-310.000</td><td class="nr" style="color:var(--danger)">-150.000</td><td class="nr" style="color:var(--success)">2.872.000</td></tr>
+              <tr><td>19/05/2026</td><td>Thu Hai</td><td class="nr" style="font-weight:600">9.450.000</td><td class="nr">53</td><td class="nr">178.302</td><td class="nr" style="color:var(--danger)">-580.000</td><td class="nr" style="color:var(--danger)">-0</td><td class="nr" style="color:var(--success)">3.780.000</td></tr>
+              <tr><td>18/05/2026</td><td>Chu Nhat</td><td class="nr" style="font-weight:600">12.800.000</td><td class="nr">68</td><td class="nr">188.235</td><td class="nr" style="color:var(--danger)">-2.100.000</td><td class="nr" style="color:var(--danger)">-320.000</td><td class="nr" style="color:var(--success)">4.992.000</td></tr>
+              <tr><td>17/05/2026</td><td>Thu Bay</td><td class="nr" style="font-weight:600">11.200.000</td><td class="nr">62</td><td class="nr">180.645</td><td class="nr" style="color:var(--danger)">-1.900.000</td><td class="nr" style="color:var(--danger)">-0</td><td class="nr" style="color:var(--success)">4.368.000</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px;border-top:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:12.5px;color:var(--g500)">Hien thi 5 / 21 ngay</span>
+            <button class="btn btn-o btn-s">Xem them</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAO CAO: LOI NHUAN GOP -->
+      <div id="r-ln" class="rpt-view" style="display:none">
+        <div class="ph"><h2>Bao cao loi nhuan gop</h2><div class="bg"><button class="btn btn-o btn-s">Xuat Excel</button></div></div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-lbl">Doanh thu thuan</div><div class="kpi-val">284.5tr</div></div>
+          <div class="kpi-card"><div class="kpi-lbl">Gia von hang ban (COGS)</div><div class="kpi-val" style="color:var(--danger)">-176.4tr</div></div>
+          <div class="kpi-card"><div class="kpi-lbl">Loi nhuan gop</div><div class="kpi-val" style="color:var(--success)">108.1tr</div><div class="kpi-chg up">Bien loi nhuan: 38%</div></div>
+          <div class="kpi-card"><div class="kpi-lbl">Chi phi van hanh</div><div class="kpi-val" style="color:var(--danger)">-24.2tr</div><div class="kpi-chg" style="color:var(--g500)">(Tu So quy)</div></div>
+        </div>
+        <div class="tc">
+          <div class="tc-head"><h3>Loi nhuan theo nhom hang</h3></div>
+          <table>
+            <thead><tr><th>Nhom hang</th><th class="nr">Doanh thu</th><th class="nr">COGS</th><th class="nr">Loi nhuan gop</th><th class="nr">Bien (%)</th></tr></thead>
+            <tbody>
+              <tr><td>Ao thun / T-shirt</td><td class="nr">84.200.000</td><td class="nr" style="color:var(--danger)">-42.100.000</td><td class="nr" style="color:var(--success);font-weight:600">42.100.000</td><td class="nr" style="color:var(--success)"><span class="b b-green">50%</span></td></tr>
+              <tr><td>Quan jeans</td><td class="nr">61.500.000</td><td class="nr" style="color:var(--danger)">-36.900.000</td><td class="nr" style="color:var(--success);font-weight:600">24.600.000</td><td class="nr"><span class="b b-blue">40%</span></td></tr>
+              <tr><td>Vay / Dam</td><td class="nr">54.800.000</td><td class="nr" style="color:var(--danger)">-27.400.000</td><td class="nr" style="color:var(--success);font-weight:600">27.400.000</td><td class="nr" style="color:var(--success)"><span class="b b-green">50%</span></td></tr>
+              <tr><td>Phu kien</td><td class="nr">28.100.000</td><td class="nr" style="color:var(--danger)">-19.670.000</td><td class="nr" style="color:var(--success);font-weight:600">8.430.000</td><td class="nr"><span class="b b-orange">30%</span></td></tr>
+              <tr><td>Giay dep</td><td class="nr">55.900.000</td><td class="nr" style="color:var(--danger)">-50.310.000</td><td class="nr" style="color:var(--success);font-weight:600">5.590.000</td><td class="nr"><span class="b b-red">10%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BAO CAO: HANG BAN CHAY -->
+      <div id="r-hh-banchay" class="rpt-view" style="display:none">
+        <div class="ph"><h2>Hang ban chay</h2><div class="bg"><select style="padding:5px 9px;border:1px solid var(--g300);border-radius:6px;font-size:12.5px"><option>Thang nay</option><option>7 ngay</option><option>Thang truoc</option></select><button class="btn btn-o btn-s">Xuat Excel</button></div></div>
+        <div class="tc">
+          <div class="fb">
+            <select><option>Xep hang theo so luong ban</option><option>Xep hang theo doanh thu</option><option>Xep hang theo loi nhuan</option></select>
+            <select><option>Tat ca nhom hang</option><option>Ao thun</option><option>Quan</option></select>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>San pham</th><th>Nhom hang</th><th class="nr">So luong ban</th><th class="nr">Doanh thu</th><th class="nr">Loi nhuan</th><th class="nr">Ton hien tai</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:700;color:var(--warning)">1</td><td style="font-weight:500">Ao thun basic (S/M/L)</td><td>Ao thun</td><td class="nr" style="font-weight:600;color:var(--primary)">312</td><td class="nr">46.800.000</td><td class="nr" style="color:var(--success)">23.400.000</td><td class="nr"><span class="b b-orange">48 cai</span></td></tr>
+              <tr><td style="font-weight:700;color:var(--g400)">2</td><td style="font-weight:500">Quan jeans slim 29</td><td>Quan jeans</td><td class="nr" style="font-weight:600;color:var(--primary)">187</td><td class="nr">71.060.000</td><td class="nr" style="color:var(--success)">28.424.000</td><td class="nr"><span class="b b-green">92 cai</span></td></tr>
+              <tr><td style="font-weight:700;color:var(--g400)">3</td><td style="font-weight:500">Tui canvas tote</td><td>Phu kien</td><td class="nr" style="font-weight:600;color:var(--primary)">164</td><td class="nr">24.600.000</td><td class="nr" style="color:var(--success)">7.380.000</td><td class="nr"><span class="b b-green">134 cai</span></td></tr>
+              <tr><td>4</td><td style="font-weight:500">Vay hoa thu ngan</td><td>Vay / Dam</td><td class="nr">141</td><td class="nr">70.500.000</td><td class="nr" style="color:var(--success)">35.250.000</td><td class="nr"><span class="b b-red">5 cai</span></td></tr>
+              <tr><td>5</td><td style="font-weight:500">Ao khoac du mong</td><td>Ao khoac</td><td class="nr">98</td><td class="nr">39.200.000</td><td class="nr" style="color:var(--success)">15.680.000</td><td class="nr"><span class="b b-green">67 cai</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BAO CAO: RFM KHACH HANG -->
+      <div id="r-kh-retain" class="rpt-view" style="display:none">
+        <div class="ph"><h2>Phan tich RFM Khach hang</h2><div class="bg"><button class="btn btn-o btn-s">Xuat danh sach</button></div></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--success)">KHACH VIP</div><div style="font-size:24px;font-weight:700;color:var(--success)">142</div><div style="font-size:11px;color:var(--g500)">Mua thường xuyen<br>GT cao</div></div>
+          <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--primary)">TRUNG THANH</div><div style="font-size:24px;font-weight:700;color:var(--primary)">318</div><div style="font-size:11px;color:var(--g500)">Mua lai thuong<br>xuyen</div></div>
+          <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--warning)">CO NGUY CO</div><div style="font-size:24px;font-weight:700;color:var(--warning)">187</div><div style="font-size:11px;color:var(--g500)">Trước mua nhiều<br>dao gân day it</div></div>
+          <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--orange)">DA MAT</div><div style="font-size:24px;font-weight:700;color:var(--orange)">293</div><div style="font-size:11px;color:var(--g500)">Khong mua<br>&gt;90 ngay</div></div>
+          <div style="background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--g500)">KHACH MOI</div><div style="font-size:24px;font-weight:700;color:var(--g600)">684</div><div style="font-size:11px;color:var(--g500)">Moi mua lan<br>dau</div></div>
+        </div>
+        <div class="tc">
+          <div class="tc-head"><h3>Danh sach khach hang Co nguy co mat</h3><div class="bg"><button class="btn btn-p btn-s">Gui ZNS win-back</button></div></div>
+          <table>
+            <thead><tr><th>Khach hang</th><th>Mua lan cuoi</th><th class="nr">Tong mua</th><th class="nr">So lan mua</th><th>Phan khuc</th></tr></thead>
+            <tbody>
+              <tr><td><div style="font-weight:500">Nguyen Thi Lan</div><div style="font-size:11px;color:var(--g500)">0965 xxx xxx</div></td><td>62 ngay truoc</td><td class="nr">8.450.000</td><td class="nr">12</td><td><span class="b b-orange">Co nguy co</span></td></tr>
+              <tr><td><div style="font-weight:500">Tran Van Duc</div><div style="font-size:11px;color:var(--g500)">0912 xxx xxx</div></td><td>74 ngay truoc</td><td class="nr">5.200.000</td><td class="nr">8</td><td><span class="b b-orange">Co nguy co</span></td></tr>
+              <tr><td><div style="font-weight:500">Pham Thu Hang</div><div style="font-size:11px;color:var(--g500)">0978 xxx xxx</div></td><td>81 ngay truoc</td><td class="nr">14.800.000</td><td class="nr">23</td><td><span class="b b-orange">Co nguy co</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PLACEHOLDER cho cac bao cao khac -->
+      <div id="r-bh-nv" class="rpt-view" style="display:none"><div class="ph"><h2>Doanh thu theo nhan vien</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128100;</div><div style="margin-top:8px">Xep hang nhan vien theo doanh so, so HD, GT TB. Xem PRD: 13-bao-cao/01-tong-quan.md §2.1</div></div></div>
+      <div id="r-bh-kenh" class="rpt-view" style="display:none"><div class="ph"><h2>Doanh thu theo kenh ban</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#127760;</div><div style="margin-top:8px">So sanh POS vs Shopee vs TikTok Shop vs Lazada. Xem PRD: 13-bao-cao §2.1</div></div></div>
+      <div id="r-bh-gio" class="rpt-view" style="display:none"><div class="ph"><h2>Doanh thu theo gio (Heatmap)</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128336;</div><div style="margin-top:8px">Bieu do nhiet: Gio vang trong ngay va thu trong tuan. Xem PRD: 13-bao-cao §2.1</div></div></div>
+      <div id="r-pl" class="rpt-view" style="display:none"><div class="ph"><h2>P&amp;L Summary</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128196;</div><div style="margin-top:8px">Doanh thu - COGS - Chi phi van hanh = Loi nhuan rong. Xem PRD: 13-bao-cao §2.2</div></div></div>
+      <div id="r-hh-tonkho" class="rpt-view" style="display:none"><div class="ph"><h2>Bao cao ton kho</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128230;</div><div style="margin-top:8px">Ton kho theo CN, canh bao duoi min, gia tri ton kho. Xem PRD: 13-bao-cao §2.3</div></div></div>
+      <div id="r-hh-chettam" class="rpt-view" style="display:none"><div class="ph"><h2>Hang ton chet / cham ban</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128564;</div><div style="margin-top:8px">SP khong ban trong 30/60/90 ngay. Xem PRD: 13-bao-cao §2.3</div></div></div>
+      <div id="r-kh-congno" class="rpt-view" style="display:none"><div class="ph"><h2>Cong no khach hang (AR Aging)</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128178;</div><div style="margin-top:8px">Phan nhom no theo tuoi: &lt;30 / 30-60 / 60-90 / &gt;90 ngay. Xem PRD: 13-bao-cao §2.4</div></div></div>
+      <div id="r-nv" class="rpt-view" style="display:none"><div class="ph"><h2>Hieu suat nhan vien</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128084;</div><div style="margin-top:8px">Xep hang NV, hoa hong, hanh vi bat thuong. Xem PRD: 13-bao-cao §2.6</div></div></div>
+      <div id="r-tc" class="rpt-view" style="display:none"><div class="ph"><h2>So quy &amp; Cash flow</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128176;</div><div style="margin-top:8px">Dong tien vao/ra, so du cac quy, du bao cash flow. Xem PRD: 13-bao-cao §2.5</div></div></div>
+      <div id="r-ncc" class="rpt-view" style="display:none"><div class="ph"><h2>Cong no nha cung cap (AP Aging)</h2></div><div class="tc" style="padding:40px;text-align:center;color:var(--g400)"><div style="font-size:36px">&#128233;</div><div style="margin-top:8px">No NCC phan nhom theo tuoi no, hieu suat NCC. Xem PRD: 13-bao-cao §2.7</div></div></div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function go(id){window.location.href='index.html';}
+function showRpt(id,el){
+  document.querySelectorAll('.rpt-view').forEach(v=>v.style.display='none');
+  document.querySelectorAll('.rpt-item').forEach(i=>i.classList.remove('active'));
+  const v=document.getElementById(id);if(v)v.style.display='block';
+  if(el)el.classList.add('active');
+}
+</script>
+</body>
+</html>

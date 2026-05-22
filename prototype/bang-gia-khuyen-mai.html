@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bang gia & Khuyen mai — Quan ly ban hang</title>
+<style>
+:root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;--success:#16a34a;--success-light:#f0fdf4;--warning:#d97706;--warning-light:#fffbeb;--danger:#dc2626;--danger-light:#fef2f2;--orange:#ea580c;--orange-light:#fff7ed;--purple:#7c3aed;--purple-light:#f5f3ff;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:var(--g800);background:var(--g50)}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;background:#1e293b;color:#cbd5e1;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155}
+.sb-logo-icon{width:30px;height:30px;background:var(--primary);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.sb-logo-name{font-weight:700;color:#f1f5f9;font-size:14px}.sb-logo-sub{font-size:11px;color:#64748b}
+.nav-group{padding:6px 0}.nav-group-label{font-size:10.5px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em;padding:5px 14px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:background .12s}
+.nav-item:hover{background:#334155;color:#e2e8f0}.nav-item.active{background:#1d4ed8;color:#fff}
+.nav-item .ico{width:16px;text-align:center;font-size:14px;flex-shrink:0}.nav-item .lbl{flex:1}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--g200);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:15px;flex:1}
+.tb-branch{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--g200);border-radius:6px;cursor:pointer;color:var(--g600);font-size:13px}
+.tb-user{display:flex;align-items:center;gap:7px;cursor:pointer}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:18px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.ph h2{font-size:17px;font-weight:700}
+.tc{background:#fff;border-radius:10px;border:1px solid var(--g200);margin-bottom:14px}
+.tc-head{padding:12px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--g200)}
+.tc-head h3{font-size:13.5px;font-weight:600;flex:1}
+table{width:100%;border-collapse:collapse}
+th{background:var(--g50);padding:9px 11px;text-align:left;font-size:11.5px;font-weight:600;color:var(--g500);border-bottom:1px solid var(--g200)}
+td{padding:9px 11px;border-bottom:1px solid var(--g100);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}.cr:hover td{background:var(--g50);cursor:pointer}
+.nr{text-align:right;font-variant-numeric:tabular-nums}
+.b{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:11.5px;font-weight:500}
+.b-blue{background:var(--primary-light);color:var(--primary)}.b-green{background:var(--success-light);color:var(--success)}
+.b-orange{background:var(--orange-light);color:var(--orange)}.b-red{background:var(--danger-light);color:var(--danger)}
+.b-gray{background:var(--g100);color:var(--g600)}.b-purple{background:var(--purple-light);color:var(--purple)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .12s}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-dark)}
+.btn-o{background:#fff;color:var(--g700);border:1px solid var(--g300)}.btn-o:hover{background:var(--g50)}
+.btn-s{padding:4px 9px;font-size:12px}.bg{display:flex;gap:7px;flex-wrap:wrap}
+.fb{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--g200);flex-wrap:wrap}
+.fb select,.fb input[type=text]{padding:5px 9px;border:1px solid var(--g300);border-radius:6px;font-size:12.5px;color:var(--g700);background:#fff;outline:none}
+.srch{display:flex;align-items:center;gap:5px;border:1px solid var(--g300);border-radius:6px;padding:5px 9px;background:#fff}
+.srch input{border:none;outline:none;font-size:12.5px;width:180px}
+.dp{background:#f8faff;border-top:2px solid var(--primary);padding:14px}
+.dp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.df label{font-size:10.5px;color:var(--g500);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.df p{font-size:13px;color:var(--g800);margin-top:2px}
+.tabs{display:flex;border-bottom:1px solid var(--g200);margin-bottom:14px}
+.tab{padding:9px 14px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--g500);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.ff label{display:block;font-size:11.5px;font-weight:600;color:var(--g600);margin-bottom:3px}
+.ff input,.ff select,.ff textarea{width:100%;padding:7px 9px;border:1px solid var(--g300);border-radius:6px;font-size:13px;outline:none;font-family:inherit}
+.ff input:focus,.ff select:focus{border-color:var(--primary)}
+.fg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.md{background:#fff;border-radius:12px;padding:22px;width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.md-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.md-h h3{font-size:15px;font-weight:700}.md-close{background:none;border:none;font-size:18px;color:var(--g400);cursor:pointer}
+.km-type-card{border:2px solid var(--g200);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .12s}
+.km-type-card:hover,.km-type-card.sel{border-color:var(--primary);background:var(--primary-light)}
+.km-type-card.sel .km-type-ico{color:var(--primary)}
+.km-type-ico{font-size:22px;margin-bottom:4px}
+.progress-bar{height:6px;background:var(--g200);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo"><div class="sb-logo-icon">KV</div><div><div class="sb-logo-name">KiotViet</div><div class="sb-logo-sub">Quan ly ban hang</div></div></div>
+  <div class="nav-group">
+    <div class="nav-item" onclick="go('dashboard')"><span class="ico">&#128202;</span><span class="lbl">Tong quan</span></div>
+    <div class="nav-item" onclick="window.open('pos.html')"><span class="ico">&#128717;</span><span class="lbl">Ban hang (POS)</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Don hang</div>
+    <div class="nav-item" onclick="go('don-hang')"><span class="ico">&#128203;</span><span class="lbl">Dat hang</span></div>
+    <div class="nav-item" onclick="go('hoa-don')"><span class="ico">&#129534;</span><span class="lbl">Hoa don</span></div>
+    <div class="nav-item" onclick="go('tra-hang')"><span class="ico">&#8617;&#65039;</span><span class="lbl">Tra hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Hang hoa &amp; Kho</div>
+    <div class="nav-item" onclick="window.location.href='hang-hoa.html'"><span class="ico">&#128230;</span><span class="lbl">Hang hoa</span></div>
+    <div class="nav-item" onclick="go('ton-kho')"><span class="ico">&#127981;</span><span class="lbl">Kho hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Mua hang</div>
+    <div class="nav-item" onclick="go('dat-hang-nhap')"><span class="ico">&#128233;</span><span class="lbl">Dat hang nhap</span></div>
+    <div class="nav-item" onclick="go('nhap-hang')"><span class="ico">&#128229;</span><span class="lbl">Nhap hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Khach hang &amp; Tai chinh</div>
+    <div class="nav-item" onclick="window.location.href='khach-hang.html'"><span class="ico">&#128101;</span><span class="lbl">Khach hang</span></div>
+    <div class="nav-item" onclick="go('so-quy')"><span class="ico">&#128176;</span><span class="lbl">So quy</span></div>
+    <div class="nav-item" onclick="go('giao-van')"><span class="ico">&#128666;</span><span class="lbl">Giao van</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Nhan su</div>
+    <div class="nav-item" onclick="window.location.href='nhan-vien.html'"><span class="ico">&#128100;</span><span class="lbl">Nhan vien</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thuong mai</div>
+    <div class="nav-item active"><span class="ico">&#127991;&#65039;</span><span class="lbl">Bang gia &amp; KM</span></div>
+    <div class="nav-item" onclick="window.location.href='kenh-ban-hang.html'"><span class="ico">&#127760;</span><span class="lbl">Kenh ban hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Phan tich</div>
+    <div class="nav-item" onclick="window.location.href='bao-cao.html'"><span class="ico">&#128200;</span><span class="lbl">Bao cao</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Tai chinh</div>
+    <div class="nav-item" onclick="window.location.href='thue-ke-toan.html'"><span class="ico">&#128196;</span><span class="lbl">Thue &amp; Ke toan</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thiet lap</div>
+    <div class="nav-item" onclick="go('nguoi-dung')"><span class="ico">&#128274;</span><span class="lbl">Nguoi dung &amp; Quyen</span></div>
+    <div class="nav-item" onclick="go('cau-hinh')"><span class="ico">&#9881;&#65039;</span><span class="lbl">Cau hinh</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Bang gia &amp; Khuyen mai</div>
+    <div class="tb-branch">&#128205; Chi nhanh 1 &#9660;</div>
+    <div style="color:var(--g300)">|</div>
+    <div class="tb-user"><div class="avatar">SH</div><span style="font-size:12.5px;color:var(--g600)">shiptest &#9660;</span></div>
+  </div>
+  <div class="content">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="stab(event,'bgtab','t-bang-gia')">Bang gia</button>
+      <button class="tab" onclick="stab(event,'bgtab','t-khuyen-mai')">Chuong trinh KM</button>
+      <button class="tab" onclick="stab(event,'bgtab','t-coupon')">Coupon / Voucher</button>
+      <button class="tab" onclick="stab(event,'bgtab','t-tich-diem')">Tich diem</button>
+    </div>
+
+    <!-- TAB 1: BANG GIA -->
+    <div id="t-bang-gia" class="bgtab">
+      <div class="ph" style="margin-bottom:12px">
+        <div></div>
+        <button class="btn btn-p btn-s" onclick="openMo('mo-tao-bg')">+ Tao bang gia moi</button>
+      </div>
+      <div class="tc">
+        <div class="tc-head"><h3>Danh sach bang gia</h3></div>
+        <table>
+          <thead><tr><th>Ten bang gia</th><th>Loai</th><th>Ap dung cho</th><th>Thoi gian</th><th>So san pham</th><th>Trang thai</th><th></th></tr></thead>
+          <tbody>
+            <tr class="cr" onclick="tog('bg0',this)">
+              <td style="font-weight:600">Bang gia chung</td>
+              <td><span class="b b-gray">Mac dinh</span></td>
+              <td>Tat ca</td><td>—</td>
+              <td>5.510 SP</td>
+              <td><span class="b b-green">Dang ap dung</span></td>
+              <td><button class="btn btn-p btn-s" onclick="event.stopPropagation()">Xem SP</button></td>
+            </tr>
+            <tr id="bg0" style="display:none"><td colspan="7" style="padding:0"><div class="dp"><p style="color:var(--g500)">Bang gia mac dinh — khong the xoa. Gia goc cua tung san pham.</p></div></td></tr>
+            <tr class="cr" onclick="tog('bg1',this)">
+              <td style="font-weight:600">Bang gia si</td>
+              <td><span class="b b-blue">Theo nhom KH</span></td>
+              <td>Nhom KH si</td><td>—</td>
+              <td>1.240 SP</td>
+              <td><span class="b b-green">Dang ap dung</span></td>
+              <td><button class="btn btn-o btn-s" onclick="event.stopPropagation()">Chinh sua</button></td>
+            </tr>
+            <tr id="bg1" style="display:none"><td colspan="7" style="padding:0">
+              <div class="dp">
+                <div class="dp-head"><strong>Bang gia si — 1.240 san pham</strong><div class="bg"><button class="btn btn-p btn-s">Sua gia hang loat</button><button class="btn btn-o btn-s">Xuat Excel</button></div></div>
+                <div class="dg">
+                  <div class="df"><label>Ap dung cho nhom KH</label><p>Nhom Khach si, Dai ly cap 1</p></div>
+                  <div class="df"><label>Giam gia chung</label><p>Giam 15% so gia ban le</p></div>
+                  <div class="df"><label>Gia san</label><p>Khong cho ban duoi gia von</p></div>
+                </div>
+                <div style="margin-top:12px">
+                  <table>
+                    <tr><th>San pham</th><th class="nr">Gia ban le</th><th class="nr">Gia si</th><th class="nr">Gia san</th></tr>
+                    <tr><td>Ao thun basic S/M/L</td><td class="nr">150.000</td><td class="nr" style="color:var(--primary);font-weight:600">127.500</td><td class="nr" style="color:var(--danger)">85.000</td></tr>
+                    <tr><td>Quan jeans slim 28-34</td><td class="nr">380.000</td><td class="nr" style="color:var(--primary);font-weight:600">323.000</td><td class="nr" style="color:var(--danger)">210.000</td></tr>
+                  </table>
+                </div>
+              </div>
+            </td></tr>
+            <tr class="cr" onclick="tog('bg2',this)">
+              <td style="font-weight:600">Bang gia VIP Gold</td>
+              <td><span class="b b-orange">Theo hang KH</span></td>
+              <td>KH hang Gold</td><td>—</td>
+              <td>5.510 SP</td>
+              <td><span class="b b-green">Dang ap dung</span></td>
+              <td><button class="btn btn-o btn-s" onclick="event.stopPropagation()">Chinh sua</button></td>
+            </tr>
+            <tr id="bg2" style="display:none"><td colspan="7" style="padding:0"><div class="dp"><p>KH hang Gold giam 5% tren toan bo san pham</p></div></td></tr>
+            <tr class="cr">
+              <td style="font-weight:600">Bang gia TikTok Shop</td>
+              <td><span class="b b-purple">Theo kenh</span></td>
+              <td>TikTok Shop</td>
+              <td><span style="font-size:12px;color:var(--g500)">20/05 - 31/05</span></td>
+              <td>320 SP</td>
+              <td><span class="b b-green">Dang ap dung</span></td>
+              <td><button class="btn btn-o btn-s">Chinh sua</button></td>
+            </tr>
+            <tr class="cr">
+              <td style="font-weight:600">Gia he 2025</td>
+              <td><span class="b b-gray">Tuy chinh</span></td>
+              <td>Tat ca</td>
+              <td><span style="font-size:12px;color:var(--g500)">01/06 - 31/08</span></td>
+              <td>890 SP</td>
+              <td><span class="b b-gray">Chua ap dung</span></td>
+              <td><button class="btn btn-o btn-s">Chinh sua</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: KHUYEN MAI -->
+    <div id="t-khuyen-mai" class="bgtab" style="display:none">
+      <div class="ph" style="margin-bottom:12px">
+        <div></div>
+        <button class="btn btn-p btn-s" onclick="openMo('mo-tao-km')">+ Tao chuong trinh KM</button>
+      </div>
+      <div class="tc">
+        <div class="fb">
+          <select><option>Tat ca trang thai</option><option>Dang chay</option><option>Sap bat dau</option><option>Da ket thuc</option><option>Tam dung</option></select>
+          <select><option>Tat ca loai KM</option><option>Giam %</option><option>Giam so tien</option><option>Mua X tang Y</option><option>Combo</option></select>
+          <div class="srch">&#128269;<input type="text" placeholder="Tim ten chuong trinh..."></div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Ten chuong trinh</th><th>Loai KM</th><th>Dieu kien</th>
+            <th>Gia tri giam</th><th>Thoi gian</th><th>Da su dung</th><th>Trang thai</th><th></th>
+          </tr></thead>
+          <tbody>
+            <tr class="cr" onclick="tog('km1',this)">
+              <td style="font-weight:600">Giam 20% cuoi tuan</td>
+              <td><span class="b b-blue">Giam %</span></td>
+              <td>Don tu 300k, T7-CN</td>
+              <td style="color:var(--danger);font-weight:600">-20%</td>
+              <td><span style="font-size:12px">17/05 - 30/06</span></td>
+              <td>
+                <div>248 lan</div>
+                <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:49%"></div></div>
+                <div style="font-size:11px;color:var(--g500)">248/500 lan gioi han</div>
+              </td>
+              <td><span class="b b-green">Dang chay</span></td>
+              <td><button class="btn btn-o btn-s" onclick="event.stopPropagation()">Sua</button></td>
+            </tr>
+            <tr id="km1" style="display:none"><td colspan="8" style="padding:0">
+              <div class="dp">
+                <div class="dp-head"><strong>Giam 20% cuoi tuan</strong><div class="bg"><button class="btn btn-o btn-s">Tam dung</button><button class="btn btn-o btn-s">Sua</button></div></div>
+                <div class="dg">
+                  <div class="df"><label>Loai giam gia</label><p>Giam 20% tren tong don</p></div>
+                  <div class="df"><label>Dieu kien</label><p>Don hang &gt;= 300.000d</p></div>
+                  <div class="df"><label>Thoi gian</label><p>T7 va CN (17:00 - ket ngay)</p></div>
+                  <div class="df"><label>Ap dung cho kenh</label><p>POS + Online</p></div>
+                  <div class="df"><label>Nhom hang ap dung</label><p>Tat ca</p></div>
+                  <div class="df"><label>Stack voi KM khac</label><p>Khong (doc quyen)</p></div>
+                </div>
+              </div>
+            </td></tr>
+            <tr class="cr" onclick="tog('km2',this)">
+              <td style="font-weight:600">Mua 2 tang 1</td>
+              <td><span class="b b-orange">Mua X tang Y</span></td>
+              <td>Mua 2 Ao thun basic</td>
+              <td style="color:var(--danger);font-weight:600">Tang 1 SP</td>
+              <td><span style="font-size:12px">01/05 - 31/05</span></td>
+              <td>
+                <div>67 lan</div>
+                <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:67%;background:var(--orange)"></div></div>
+                <div style="font-size:11px;color:var(--g500)">67/100 lan gioi han</div>
+              </td>
+              <td><span class="b b-green">Dang chay</span></td>
+              <td><button class="btn btn-o btn-s" onclick="event.stopPropagation()">Sua</button></td>
+            </tr>
+            <tr id="km2" style="display:none"><td colspan="8" style="padding:0"><div class="dp"><p>Mua 2 san pham ao thun basic bat ky size → tang 1 san pham ao thun basic co gia thap nhat</p></div></td></tr>
+            <tr class="cr">
+              <td style="font-weight:600">Flash sale 6.6</td>
+              <td><span class="b b-red">Giam %</span></td>
+              <td>Flash sale 10h-12h</td>
+              <td style="color:var(--danger);font-weight:600">-30%</td>
+              <td><span style="font-size:12px">06/06 10:00-12:00</span></td>
+              <td>—</td>
+              <td><span class="b b-gray">Sap bat dau</span></td>
+              <td><button class="btn btn-o btn-s">Sua</button></td>
+            </tr>
+            <tr class="cr">
+              <td style="font-weight:600">Combo bo qua tang</td>
+              <td><span class="b b-purple">Combo</span></td>
+              <td>Ao + Quan + Tui = 450k</td>
+              <td style="color:var(--danger);font-weight:600">-25%</td>
+              <td><span style="font-size:12px">01/05 - 30/06</span></td>
+              <td>34 lan</td>
+              <td><span class="b b-green">Dang chay</span></td>
+              <td><button class="btn btn-o btn-s">Sua</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: COUPON -->
+    <div id="t-coupon" class="bgtab" style="display:none">
+      <div class="ph" style="margin-bottom:12px">
+        <div></div>
+        <div class="bg">
+          <button class="btn btn-o btn-s">Tao voucher hang loat</button>
+          <button class="btn btn-p btn-s" onclick="openMo('mo-tao-coupon')">+ Tao coupon code</button>
+        </div>
+      </div>
+      <div class="tc">
+        <div class="fb">
+          <select><option>Tat ca trang thai</option><option>Dang hoat dong</option><option>Het han</option><option>Da het luot</option></select>
+          <div class="srch">&#128269;<input type="text" placeholder="Tim ma coupon..."></div>
+        </div>
+        <table>
+          <thead><tr><th>Ma coupon</th><th>Loai giam</th><th>Gia tri</th><th>Dieu kien</th><th>Da su dung / Gioi han</th><th>Het han</th><th>Trang thai</th><th></th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;color:var(--primary);font-family:monospace">GIAM50K</td><td>So tien</td><td style="color:var(--danger);font-weight:600">-50.000d</td><td>Don >= 300k</td><td>87 / 200</td><td>31/05/2026</td><td><span class="b b-green">Hoat dong</span></td><td><button class="btn btn-o btn-s">Sua</button></td></tr>
+            <tr><td style="font-weight:600;color:var(--primary);font-family:monospace">NEWKH30</td><td>%</td><td style="color:var(--danger);font-weight:600">-30%</td><td>KH moi, don dau tien</td><td>43 / 100</td><td>30/06/2026</td><td><span class="b b-green">Hoat dong</span></td><td><button class="btn btn-o btn-s">Sua</button></td></tr>
+            <tr><td style="font-weight:600;color:var(--g400);font-family:monospace">TET2026</td><td>%</td><td style="color:var(--g400)">-15%</td><td>Don >= 500k</td><td>500 / 500</td><td>15/02/2026</td><td><span class="b b-gray">Het luot</span></td><td><button class="btn btn-o btn-s">Xem</button></td></tr>
+            <tr><td style="font-weight:600;color:var(--primary);font-family:monospace">FLASHWED</td><td>%</td><td style="color:var(--danger);font-weight:600">-25%</td><td>T4 hang tuan, don >= 200k</td><td>12 / khong gioi han</td><td>30/06/2026</td><td><span class="b b-green">Hoat dong</span></td><td><button class="btn btn-o btn-s">Sua</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: TICH DIEM -->
+    <div id="t-tich-diem" class="bgtab" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="tc">
+          <div class="tc-head"><h3>Cau hinh tich diem</h3><button class="btn btn-o btn-s">Chinh sua</button></div>
+          <div style="padding:14px">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <span style="color:var(--g600)">Ty le tich diem</span>
+              <span style="font-weight:600">1 diem / 1.000d mua hang</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <span style="color:var(--g600)">Don toi thieu de tich</span>
+              <span style="font-weight:600">100.000d</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <span style="color:var(--g600)">Hang hoa tich diem</span>
+              <span style="font-weight:600">SP co tag "Tich diem"</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0">
+              <span style="color:var(--g600)">Tich diem khi ap KM</span>
+              <span class="b b-orange">Khong tinh</span>
+            </div>
+          </div>
+        </div>
+        <div class="tc">
+          <div class="tc-head"><h3>Cau hinh doi diem</h3><button class="btn btn-o btn-s">Chinh sua</button></div>
+          <div style="padding:14px">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <span style="color:var(--g600)">Ty le doi diem</span>
+              <span style="font-weight:600">100 diem = 10.000d</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <span style="color:var(--g600)">Doi toi da / don</span>
+              <span style="font-weight:600">30% gia tri don</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <span style="color:var(--g600)">Diem toi thieu de doi</span>
+              <span style="font-weight:600">200 diem</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0">
+              <span style="color:var(--g600)">Diem het han sau</span>
+              <span class="b b-orange">12 thang khong mua</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tc">
+        <div class="tc-head"><h3>Thong ke tich diem</h3></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+          <div style="padding:16px;text-align:center;border-right:1px solid var(--g200)"><div style="font-size:12px;color:var(--g500)">Tong diem da phat</div><div style="font-size:22px;font-weight:700;color:var(--primary)">1.248.500</div></div>
+          <div style="padding:16px;text-align:center;border-right:1px solid var(--g200)"><div style="font-size:12px;color:var(--g500)">Da doi</div><div style="font-size:22px;font-weight:700;color:var(--orange)">342.800</div></div>
+          <div style="padding:16px;text-align:center;border-right:1px solid var(--g200)"><div style="font-size:12px;color:var(--g500)">Con hieu luc</div><div style="font-size:22px;font-weight:700;color:var(--success)">905.700</div></div>
+          <div style="padding:16px;text-align:center"><div style="font-size:12px;color:var(--g500)">Sap het han (30 ngay)</div><div style="font-size:22px;font-weight:700;color:var(--danger)">28.400</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAL: TAO BANG GIA -->
+<div class="mo" id="mo-tao-bg">
+  <div class="md">
+    <div class="md-h"><h3>Tao bang gia moi</h3><button class="md-close" onclick="closeMo('mo-tao-bg')">&#10005;</button></div>
+    <div class="fg" style="margin-bottom:12px">
+      <div class="ff"><label>Ten bang gia *</label><input type="text" placeholder="Bang gia si, Bang gia VIP..."></div>
+      <div class="ff"><label>Loai bang gia</label><select><option>Theo nhom KH</option><option>Theo hang KH</option><option>Theo kenh ban</option><option>Tuy chinh</option></select></div>
+      <div class="ff"><label>Ap dung cho</label><select><option>Nhom KH si</option><option>KH hang Gold</option><option>Shopee</option><option>TikTok Shop</option></select></div>
+      <div class="ff"><label>Giam gia chung (%)</label><input type="number" placeholder="0"></div>
+      <div class="ff"><label>Hieu luc tu ngay</label><input type="date"></div>
+      <div class="ff"><label>Hieu luc den ngay</label><input type="date" placeholder="Khong gioi han"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-o" onclick="closeMo('mo-tao-bg')">Huy</button>
+      <button class="btn btn-p" onclick="closeMo('mo-tao-bg')">Tao bang gia</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: TAO KHUYEN MAI -->
+<div class="mo" id="mo-tao-km">
+  <div class="md" style="width:620px">
+    <div class="md-h"><h3>Tao chuong trinh khuyen mai</h3><button class="md-close" onclick="closeMo('mo-tao-km')">&#10005;</button></div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:8px">CHON LOAI KHUYEN MAI</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="km-type-card sel" onclick="selType(this)"><div class="km-type-ico">&#128181;</div><div style="font-weight:600;font-size:13px">Giam %</div><div style="font-size:11px;color:var(--g500)">Giam X% tren don</div></div>
+        <div class="km-type-card" onclick="selType(this)"><div class="km-type-ico">&#128176;</div><div style="font-weight:600;font-size:13px">Giam so tien</div><div style="font-size:11px;color:var(--g500)">Giam X dong co dinh</div></div>
+        <div class="km-type-card" onclick="selType(this)"><div class="km-type-ico">&#127873;</div><div style="font-weight:600;font-size:13px">Mua X tang Y</div><div style="font-size:11px;color:var(--g500)">Mua du so luong tang SP</div></div>
+        <div class="km-type-card" onclick="selType(this)"><div class="km-type-ico">&#127916;</div><div style="font-weight:600;font-size:13px">Combo</div><div style="font-size:11px;color:var(--g500)">Bo SP voi gia uu dai</div></div>
+        <div class="km-type-card" onclick="selType(this)"><div class="km-type-ico">&#127381;</div><div style="font-weight:600;font-size:13px">Tang hang</div><div style="font-size:11px;color:var(--g500)">Don dat X tang SP Z</div></div>
+        <div class="km-type-card" onclick="selType(this)"><div class="km-type-ico">&#127758;</div><div style="font-weight:600;font-size:13px">Mien ship</div><div style="font-size:11px;color:var(--g500)">Giam/mien phi van chuyen</div></div>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px">
+      <div class="ff"><label>Ten chuong trinh *</label><input type="text" placeholder="Giam 20% cuoi tuan..."></div>
+      <div class="ff"><label>Gia tri giam *</label><input type="text" placeholder="20 (%)"></div>
+      <div class="ff"><label>Don hang toi thieu</label><input type="text" placeholder="300.000"></div>
+      <div class="ff"><label>Gioi han luot su dung</label><input type="text" placeholder="Khong gioi han"></div>
+      <div class="ff"><label>Bat dau</label><input type="datetime-local"></div>
+      <div class="ff"><label>Ket thuc</label><input type="datetime-local"></div>
+      <div class="ff"><label>Ap dung kenh</label><select><option>Tat ca kenh</option><option>Chi POS</option><option>Chi online</option></select></div>
+      <div class="ff"><label>Stack KM khac</label><select><option>Khong (doc quyen)</option><option>Cho phep stack</option></select></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-o" onclick="closeMo('mo-tao-km')">Huy</button>
+      <button class="btn btn-p" onclick="closeMo('mo-tao-km')">Tao chuong trinh</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: TAO COUPON -->
+<div class="mo" id="mo-tao-coupon">
+  <div class="md" style="width:460px">
+    <div class="md-h"><h3>Tao coupon code</h3><button class="md-close" onclick="closeMo('mo-tao-coupon')">&#10005;</button></div>
+    <div class="fg" style="margin-bottom:12px">
+      <div class="ff"><label>Ma coupon *</label><input type="text" placeholder="GIAM50K" style="font-family:monospace;text-transform:uppercase"></div>
+      <div class="ff"><label>Loai giam</label><select><option>Giam so tien</option><option>Giam %</option></select></div>
+      <div class="ff"><label>Gia tri giam *</label><input type="text" placeholder="50.000"></div>
+      <div class="ff"><label>Don toi thieu</label><input type="text" placeholder="300.000"></div>
+      <div class="ff"><label>Gioi han tong luot dung</label><input type="text" placeholder="200"></div>
+      <div class="ff"><label>Gioi han moi KH</label><input type="text" placeholder="1"></div>
+      <div class="ff"><label>Het han</label><input type="date"></div>
+      <div class="ff"><label>Ap dung nhom KH</label><select><option>Tat ca KH</option><option>KH moi</option><option>KH cu 30 ngay</option></select></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-o" onclick="closeMo('mo-tao-coupon')">Huy</button>
+      <button class="btn btn-p" onclick="closeMo('mo-tao-coupon')">Tao coupon</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(id){window.location.href='index.html';}
+function tog(id,row){const d=document.getElementById(id);if(!d)return;d.style.display=d.style.display==='none'||d.style.display===''?'table-row':'none';}
+function stab(e,grp,targetId){
+  document.querySelectorAll('.'+grp).forEach(t=>{t.style.display='none';});
+  const t=document.getElementById(targetId);if(t)t.style.display='block';
+  e.target.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+}
+function selType(el){document.querySelectorAll('.km-type-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function openMo(id){document.getElementById(id).classList.add('open');}
+function closeMo(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
+</script>
+</body>
+</html>

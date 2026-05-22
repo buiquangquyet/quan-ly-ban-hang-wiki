@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hang hoa — Quan ly ban hang</title>
+<style>
+:root {
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;
+  --success:#16a34a;--success-light:#f0fdf4;
+  --warning:#d97706;--warning-light:#fffbeb;
+  --danger:#dc2626;--danger-light:#fef2f2;
+  --orange:#ea580c;--orange-light:#fff7ed;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;
+  --g400:#9ca3af;--g500:#6b7280;--g600:#4b5563;--g700:#374151;--g800:#1f2937;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:var(--g800);background:var(--g50)}
+.app{display:flex;height:100vh;overflow:hidden}
+/* SIDEBAR */
+.sidebar{width:220px;background:#1e293b;color:#cbd5e1;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155}
+.sb-logo-icon{width:30px;height:30px;background:var(--primary);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+.sb-logo-name{font-weight:700;color:#f1f5f9;font-size:14px}
+.sb-logo-sub{font-size:11px;color:#64748b}
+.nav-group{padding:6px 0}
+.nav-group-label{font-size:10.5px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em;padding:5px 14px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:background .12s}
+.nav-item:hover{background:#334155;color:#e2e8f0}
+.nav-item.active{background:#1d4ed8;color:#fff}
+.nav-item .ico{width:16px;text-align:center;font-size:14px;flex-shrink:0}
+.nav-item .lbl{flex:1}
+.nav-badge{background:#ef4444;color:#fff;border-radius:10px;font-size:10px;padding:1px 5px;font-weight:700}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;background:#fff;border-bottom:1px solid var(--g200);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:15px;flex:1}
+.tb-branch{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--g200);border-radius:6px;cursor:pointer;color:var(--g600);font-size:13px}
+.tb-user{display:flex;align-items:center;gap:7px;cursor:pointer}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:18px}
+/* PAGE HEADER */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ph h2{font-size:17px;font-weight:700}
+/* TABLE CARD */
+.tc{background:#fff;border-radius:10px;border:1px solid var(--g200);margin-bottom:14px}
+table{width:100%;border-collapse:collapse}
+th{background:var(--g50);padding:9px 11px;text-align:left;font-size:11.5px;font-weight:600;color:var(--g500);border-bottom:1px solid var(--g200)}
+td{padding:9px 11px;border-bottom:1px solid var(--g100);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.cr:hover td{background:var(--g50);cursor:pointer}
+.nr{text-align:right;font-variant-numeric:tabular-nums}
+/* BADGES */
+.b{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:11.5px;font-weight:500}
+.b-blue{background:var(--primary-light);color:var(--primary)}
+.b-green{background:var(--success-light);color:var(--success)}
+.b-orange{background:var(--orange-light);color:var(--orange)}
+.b-red{background:var(--danger-light);color:var(--danger)}
+.b-gray{background:var(--g100);color:var(--g600)}
+.b-purple{background:var(--purple-light);color:var(--purple)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .12s}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-dark)}
+.btn-o{background:#fff;color:var(--g700);border:1px solid var(--g300)}.btn-o:hover{background:var(--g50)}
+.btn-r{background:var(--danger);color:#fff}
+.btn-s{padding:4px 9px;font-size:12px}
+.bg{display:flex;gap:7px;flex-wrap:wrap}
+/* FILTER BAR */
+.fb{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--g200);flex-wrap:wrap}
+.fb select,.fb input[type=text]{padding:5px 9px;border:1px solid var(--g300);border-radius:6px;font-size:12.5px;color:var(--g700);background:#fff;outline:none}
+.fb select:focus,.fb input:focus{border-color:var(--primary)}
+.srch{display:flex;align-items:center;gap:5px;border:1px solid var(--g300);border-radius:6px;padding:5px 9px;background:#fff}
+.srch input{border:none;outline:none;font-size:12.5px;width:180px}
+/* DETAIL PANEL */
+.dp{background:#f8faff;border-top:2px solid var(--primary);padding:14px;animation:sd .15s ease}
+@keyframes sd{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.dp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.df label{font-size:10.5px;color:var(--g500);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.df p{font-size:13px;color:var(--g800);margin-top:2px}
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--g200);margin-bottom:14px}
+.tab{padding:9px 14px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--g500);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+/* FORMS */
+.ff label{display:block;font-size:11.5px;font-weight:600;color:var(--g600);margin-bottom:3px}
+.ff input,.ff select,.ff textarea,.fi{width:100%;padding:7px 9px;border:1px solid var(--g300);border-radius:6px;font-size:13px;outline:none;font-family:inherit}
+.ff input:focus,.ff select:focus,.fi:focus{border-color:var(--primary)}
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.md{background:#fff;border-radius:12px;padding:22px;width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.md-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.md-h h3{font-size:15px;font-weight:700}
+.md-close{background:none;border:none;font-size:18px;color:var(--g400);cursor:pointer}
+/* MODAL MO-BOX (Tao hang hoa) */
+.mo-box{background:#fff;border-radius:12px;width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.mo-hd{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--g200)}
+.mo-hd h3{font-size:15px;font-weight:700}
+.mo-x{background:none;border:none;font-size:18px;color:var(--g400);cursor:pointer}
+.mo-bd{padding:18px 22px}
+.mo-ft{padding:14px 22px;border-top:1px solid var(--g200);display:flex;justify-content:flex-end;gap:8px}
+/* HANG HOA CATEGORY TREE */
+.hh-cat{padding:5px 8px;border-radius:5px;cursor:pointer;font-size:13px;color:var(--g600);user-select:none}
+.hh-cat:hover{background:var(--g100)}
+.hh-cat.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.hh-cat-group{margin-bottom:2px}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">KV</div>
+    <div><div class="sb-logo-name">KiotViet</div><div class="sb-logo-sub">Quan ly ban hang</div></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-item" onclick="go('dashboard')"><span class="ico">&#128202;</span><span class="lbl">Tong quan</span></div>
+    <div class="nav-item" onclick="window.open('pos.html')"><span class="ico">&#128717;</span><span class="lbl">Ban hang (POS)</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Don hang</div>
+    <div class="nav-item" onclick="go('don-hang')"><span class="ico">&#128203;</span><span class="lbl">Dat hang</span></div>
+    <div class="nav-item" onclick="go('hoa-don')"><span class="ico">&#129534;</span><span class="lbl">Hoa don</span></div>
+    <div class="nav-item" onclick="go('tra-hang')"><span class="ico">&#8617;&#65039;</span><span class="lbl">Tra hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Hang hoa &amp; Kho</div>
+    <div class="nav-item active"><span class="ico">&#128230;</span><span class="lbl">Hang hoa</span></div>
+    <div class="nav-item" onclick="go('ton-kho')"><span class="ico">&#127981;</span><span class="lbl">Kho hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Mua hang</div>
+    <div class="nav-item" onclick="go('dat-hang-nhap')"><span class="ico">&#128233;</span><span class="lbl">Dat hang nhap</span></div>
+    <div class="nav-item" onclick="go('nhap-hang')"><span class="ico">&#128229;</span><span class="lbl">Nhap hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Khach hang &amp; Tai chinh</div>
+    <div class="nav-item" onclick="window.location.href='khach-hang.html'"><span class="ico">&#128101;</span><span class="lbl">Khach hang</span></div>
+    <div class="nav-item" onclick="window.location.href='so-quy.html'"><span class="ico">&#128176;</span><span class="lbl">So quy</span></div>
+    <div class="nav-item" onclick="go('giao-van')"><span class="ico">&#128666;</span><span class="lbl">Giao van</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Nhan su</div>
+    <div class="nav-item" onclick="window.location.href='nhan-vien.html'"><span class="ico">&#128100;</span><span class="lbl">Nhan vien</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thuong mai</div>
+    <div class="nav-item" onclick="window.location.href='bang-gia-khuyen-mai.html'"><span class="ico">&#127991;&#65039;</span><span class="lbl">Bang gia &amp; KM</span></div>
+    <div class="nav-item" onclick="window.location.href='kenh-ban-hang.html'"><span class="ico">&#127760;</span><span class="lbl">Kenh ban hang</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Phan tich</div>
+    <div class="nav-item" onclick="window.location.href='bao-cao.html'"><span class="ico">&#128200;</span><span class="lbl">Bao cao</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Tai chinh mo rong</div>
+    <div class="nav-item" onclick="window.location.href='thue-ke-toan.html'"><span class="ico">&#128196;</span><span class="lbl">Thue &amp; Ke toan</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Thiet lap</div>
+    <div class="nav-item" onclick="go('nguoi-dung')"><span class="ico">&#128274;</span><span class="lbl">Nguoi dung &amp; Quyen</span></div>
+    <div class="nav-item" onclick="go('cau-hinh')"><span class="ico">&#9881;&#65039;</span><span class="lbl">Cau hinh</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Hang hoa</div>
+    <div class="tb-branch">&#128205; Chi nhanh 1 &#9660;</div>
+    <div style="color:var(--g300)">|</div>
+    <div class="tb-user"><div class="avatar">SH</div><span style="font-size:12.5px;color:var(--g600)">shiptest &#9660;</span></div>
+  </div>
+  <div class="content">
+
+    <!-- PAGE HEADER -->
+    <div class="ph">
+      <h2>Hang hoa</h2>
+      <div class="bg">
+        <button class="btn btn-o btn-s">Import</button>
+        <button class="btn btn-o btn-s">Xuat file</button>
+        <button class="btn btn-p btn-s" onclick="openMo('mo-tao-sp')">+ Them hang hoa</button>
+      </div>
+    </div>
+
+    <!-- TWO-COLUMN LAYOUT -->
+    <div style="display:grid;grid-template-columns:190px 1fr;gap:14px;align-items:start">
+
+      <!-- CATEGORY TREE -->
+      <div class="tc" style="padding:8px;align-self:start;overflow-y:auto">
+        <div style="font-size:11px;font-weight:600;color:var(--g500);padding:6px 8px;text-transform:uppercase">Nhom hang</div>
+        <div id="cat-all" class="hh-cat active" onclick="selCat('all',this)">Tat ca (5.510)</div>
+        <div class="hh-cat-group">
+          <div class="hh-cat" onclick="selCat('giay',this)">&#9656; Giay dep (1.820)</div>
+          <div style="padding-left:14px">
+            <div class="hh-cat" onclick="selCat('giay-tt',this)">Giay the thao (890)</div>
+            <div class="hh-cat" onclick="selCat('giay-ca',this)">Giay casual (540)</div>
+            <div class="hh-cat" onclick="selCat('giay-cn',this)">Giay cong nghe (390)</div>
+          </div>
+        </div>
+        <div class="hh-cat-group">
+          <div class="hh-cat" onclick="selCat('pk',this)">&#9656; Phu kien (1.230)</div>
+          <div style="padding-left:14px">
+            <div class="hh-cat" onclick="selCat('tui',this)">Tui xach (430)</div>
+            <div class="hh-cat" onclick="selCat('tat',this)">Tat / Vo (280)</div>
+            <div class="hh-cat" onclick="selCat('khac',this)">Khac (520)</div>
+          </div>
+        </div>
+        <div class="hh-cat" onclick="selCat('trang-phuc',this)">Trang phuc (980)</div>
+        <div class="hh-cat" onclick="selCat('sport',this)">Do the thao (760)</div>
+        <div class="hh-cat" onclick="selCat('acc',this)">Phu tung / BHLĐ (720)</div>
+        <div style="margin-top:10px;border-top:1px solid var(--g200);padding-top:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--g500);padding:4px 8px;text-transform:uppercase">Thuong hieu</div>
+          <div class="hh-cat" onclick="selCat('adidas',this)">Adidas (612)</div>
+          <div class="hh-cat" onclick="selCat('nike',this)">Nike (543)</div>
+          <div class="hh-cat" onclick="selCat('puma',this)">Puma (298)</div>
+          <div class="hh-cat" onclick="selCat('local',this)">Hang noi dia (2.057)</div>
+        </div>
+      </div>
+
+      <!-- PRODUCT LIST + INLINE DETAIL -->
+      <div class="tc" style="overflow:auto">
+        <div class="fb">
+          <select><option>Tat ca trang thai</option><option>Dang KD</option><option>Ngung KD</option></select>
+          <select><option>Tat ca ton kho</option><option>Con hang</option><option>Sap het (&lt;10)</option><option>Het hang</option><option>Am ton</option></select>
+          <select><option>Tat ca loai SP</option><option>Hang hoa thuong</option><option>Co bien the</option><option>Dich vu</option><option>Combo</option></select>
+          <div class="srch">&#128269;<input type="text" placeholder="Tim ma, ten, ma vach... (F3)"></div>
+        </div>
+        <table>
+          <thead><tr>
+            <th><input type="checkbox"></th>
+            <th>Hinh</th>
+            <th>Ma hang / Ten hang</th>
+            <th>Nhom</th>
+            <th>DVT</th>
+            <th class="nr">Gia ban</th>
+            <th class="nr">Gia von</th>
+            <th class="nr">Margin</th>
+            <th class="nr">Ton CN1</th>
+            <th class="nr">Ton TT</th>
+            <th>Trang thai</th>
+          </tr></thead>
+          <tbody>
+
+            <!-- SP001234 — OPEN BY DEFAULT -->
+            <tr class="cr" onclick="tog('sp1',this)">
+              <td><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+              <td><div style="width:32px;height:32px;background:var(--g100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">&#128095;</div></td>
+              <td><div style="font-weight:600;color:var(--primary)">SP001234</div><div style="font-size:12px">Giay Adidas Ultraboost 22</div><div style="font-size:11px;color:var(--g400)">6 bien the</div></td>
+              <td>Giay the thao</td><td>Cai</td><td class="nr">2.350.000</td><td class="nr">1.620.000</td>
+              <td class="nr"><span style="color:var(--success);font-weight:600">31%</span></td>
+              <td class="nr" style="color:var(--success);font-weight:600">15</td>
+              <td class="nr" style="color:var(--success);font-weight:600">8</td>
+              <td><span class="b b-green">Dang KD</span></td>
+            </tr>
+            <tr id="sp1" style="display:table-row"><td colspan="11" style="padding:0">
+              <div class="dp">
+                <div class="dp-head">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:44px;height:44px;background:var(--g100);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">&#128095;</div>
+                    <div>
+                      <div style="font-weight:700;font-size:14px">Giay Adidas Ultraboost 22</div>
+                      <div style="font-size:12px;color:var(--g500)">SP001234 &nbsp;|&nbsp; Barcode: 8936123456789</div>
+                      <div style="margin-top:3px;display:flex;gap:5px">
+                        <span class="b b-green">Dang KD</span>
+                        <span class="b b-blue">Co bien the</span>
+                        <span style="font-size:10px;background:#e0f2fe;color:#0369a1;padding:2px 7px;border-radius:10px">Adidas</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg">
+                    <button class="btn btn-p btn-s">Sua</button>
+                    <button class="btn btn-o btn-s">In tem</button>
+                    <button class="btn btn-o btn-s">Sao chep</button>
+                    <button class="btn btn-o btn-s" style="color:var(--danger)">Ngung KD</button>
+                  </div>
+                </div>
+                <div class="dg">
+                  <div class="df"><label>Loai san pham</label><p>Hang hoa co bien the</p></div>
+                  <div class="df"><label>Nhom hang</label><p>Giay the thao</p></div>
+                  <div class="df"><label>Thuong hieu</label><p>Adidas</p></div>
+                  <div class="df"><label>Don vi tinh co ban</label><p>Cai</p></div>
+                  <div class="df"><label>Gia ban (sau thue)</label><p style="font-weight:700;color:var(--primary)">2.350.000d <span style="font-weight:400;font-size:11px;color:var(--g400)">VAT 10%</span></p></div>
+                  <div class="df"><label>Gia von (WAC) / Margin</label><p>1.620.000d &nbsp;<span style="color:var(--success)">Margin 31%</span></p></div>
+                </div>
+                <div class="tabs" style="margin-top:12px;border-bottom:1px solid var(--g200)">
+                  <button class="tab active" onclick="stab(event,'spt','sp1-info')">Thong tin</button>
+                  <button class="tab" onclick="stab(event,'spt','sp1-mota')">Mo ta</button>
+                  <button class="tab" onclick="stab(event,'spt','sp1-thekho')">The kho</button>
+                  <button class="tab" onclick="stab(event,'spt','sp1-tonkho')">Ton kho</button>
+                  <button class="tab" onclick="stab(event,'spt','sp1-kenh')">Lien ket kenh</button>
+                </div>
+
+                <!-- Tab Thong tin -->
+                <div id="sp1-info" class="spt" style="margin-top:10px">
+                  <div style="margin-bottom:12px">
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Bang gia</div>
+                    <table style="border:1px solid var(--g200);border-radius:7px;overflow:hidden;font-size:12px">
+                      <tr style="background:var(--g50)"><th style="text-align:left">Bang gia</th><th class="nr">Gia ban</th><th></th></tr>
+                      <tr><td>Bang gia chung</td><td class="nr" style="font-weight:600">2.350.000</td><td><span class="b b-blue">Mac dinh</span></td></tr>
+                      <tr><td>Bang gia si</td><td class="nr" style="font-weight:600">2.100.000</td><td></td></tr>
+                      <tr><td>Bang gia VIP</td><td class="nr" style="font-weight:600">2.200.000</td><td></td></tr>
+                    </table>
+                  </div>
+                  <div style="margin-bottom:12px">
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Don vi tinh</div>
+                    <table style="border:1px solid var(--g200);border-radius:7px;overflow:hidden;font-size:12px">
+                      <tr style="background:var(--g50)"><th style="text-align:left">Ten DVT</th><th class="nr">He so</th><th class="nr">Gia ban</th><th>Barcode</th></tr>
+                      <tr><td><strong>Cai</strong> <span style="font-size:10px;color:var(--primary)">(co ban)</span></td><td class="nr">1</td><td class="nr" style="font-weight:600">2.350.000</td><td style="color:var(--g400)">8936123456789</td></tr>
+                      <tr><td>Doi (2 cai)</td><td class="nr">2</td><td class="nr" style="font-weight:600">4.500.000</td><td style="color:var(--g400)">—</td></tr>
+                    </table>
+                  </div>
+                  <div style="margin-bottom:12px">
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Bien the (Size × Mau)</div>
+                    <table style="border:1px solid var(--g200);border-radius:7px;overflow:hidden;font-size:12px">
+                      <tr style="background:var(--g50)"><th>Size / Mau</th><th>Ma SP</th><th class="nr">Gia ban</th><th class="nr">Ton CN1</th><th class="nr">Ton TT</th></tr>
+                      <tr><td>Size 40 / Den</td><td style="color:var(--primary)">SP001234-40D</td><td class="nr">2.350.000</td><td class="nr" style="color:var(--success);font-weight:600">5</td><td class="nr" style="color:var(--success);font-weight:600">3</td></tr>
+                      <tr><td>Size 41 / Den</td><td style="color:var(--primary)">SP001234-41D</td><td class="nr">2.350.000</td><td class="nr" style="color:var(--success);font-weight:600">4</td><td class="nr" style="color:var(--success);font-weight:600">2</td></tr>
+                      <tr><td>Size 42 / Den</td><td style="color:var(--primary)">SP001234-42D</td><td class="nr">2.350.000</td><td class="nr" style="color:var(--warning);font-weight:600">2</td><td class="nr" style="color:var(--success);font-weight:600">3</td></tr>
+                      <tr><td>Size 40 / Trang</td><td style="color:var(--primary)">SP001234-40T</td><td class="nr">2.350.000</td><td class="nr" style="color:var(--success);font-weight:600">4</td><td class="nr" style="color:var(--danger);font-weight:600">0</td></tr>
+                      <tr><td>Size 41 / Trang</td><td style="color:var(--primary)">SP001234-41T</td><td class="nr">2.350.000</td><td class="nr" style="color:var(--danger);font-weight:600">0</td><td class="nr" style="color:var(--danger);font-weight:600">0</td></tr>
+                    </table>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Cai dat theo chi nhanh</div>
+                    <table style="border:1px solid var(--g200);border-radius:7px;overflow:hidden;font-size:12px">
+                      <tr style="background:var(--g50)"><th>Chi nhanh</th><th>Trang thai KD</th><th class="nr">Min</th><th class="nr">Max</th><th>Vi tri kho</th></tr>
+                      <tr><td style="font-weight:500">CN Quan 1</td><td><span class="b b-green">Dang KD</span></td><td class="nr">5</td><td class="nr">50</td><td style="color:var(--g500)">Ke A2 - Tang 1</td></tr>
+                      <tr><td style="font-weight:500">CN Trung tam</td><td><span class="b b-green">Dang KD</span></td><td class="nr">3</td><td class="nr">30</td><td style="color:var(--g500)">Ke B1 - Tang 2</td></tr>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Tab Mo ta -->
+                <div id="sp1-mota" class="spt" style="display:none;margin-top:10px">
+                  <div style="margin-bottom:10px">
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Mo ta san pham</div>
+                    <div style="padding:10px;border:1px solid var(--g200);border-radius:6px;font-size:13px;line-height:1.6;color:var(--g700);background:var(--g50)">
+                      <strong>Giay Adidas Ultraboost 22</strong> — dong giay chay bo cao cap voi de Boost cushioning.<br><br>
+                      &#9679; Mui giay Primeknit+ thich ung voi moi ban chan<br>
+                      &#9679; Cong nghe de Boost doi moi — hieu suat tu nhien 100%<br>
+                      &#9679; De ngoai Continental™ Rubber tang cuong bam duong<br>
+                      &#9679; Trong luong: 330g (size 42)
+                    </div>
+                  </div>
+                  <div style="margin-bottom:10px">
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Ghi chu noi bo</div>
+                    <div style="padding:8px 10px;border:1px solid var(--g200);border-radius:6px;font-size:12.5px;color:var(--g600);background:var(--g50)">NCC: Adidas VN — giao trong 5-7 ngay. Luu y: bien the size 43+ it ton — nen dat truoc khi ban.</div>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:6px">Tags</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      <span style="background:var(--g100);padding:3px 9px;border-radius:12px;font-size:12px">chay-bo</span>
+                      <span style="background:var(--g100);padding:3px 9px;border-radius:12px;font-size:12px">adidas</span>
+                      <span style="background:var(--g100);padding:3px 9px;border-radius:12px;font-size:12px">ultraboost</span>
+                      <span style="background:var(--g100);padding:3px 9px;border-radius:12px;font-size:12px">premium</span>
+                      <span style="border:1px dashed var(--g300);padding:3px 9px;border-radius:12px;font-size:12px;cursor:pointer;color:var(--g400)">+ Them tag</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tab The kho -->
+                <div id="sp1-thekho" class="spt" style="display:none;margin-top:10px">
+                  <div style="display:flex;gap:8px;margin-bottom:8px">
+                    <select style="padding:4px 8px;border:1px solid var(--g200);border-radius:5px;font-size:12px"><option>Tat ca CN</option><option>CN Quan 1</option><option>CN Trung tam</option></select>
+                    <select style="padding:4px 8px;border:1px solid var(--g200);border-radius:5px;font-size:12px"><option>30 ngay qua</option><option>7 ngay qua</option><option>Hom nay</option></select>
+                    <select style="padding:4px 8px;border:1px solid var(--g200);border-radius:5px;font-size:12px"><option>Tat ca loai GD</option><option>Ban hang</option><option>Nhap hang</option><option>Tra hang</option><option>Chuyen hang</option></select>
+                  </div>
+                  <table style="border:1px solid var(--g200);border-radius:7px;overflow:hidden;font-size:12px">
+                    <tr style="background:var(--g50)"><th>Chung tu</th><th>Thoi gian</th><th>Loai GD</th><th>Doi tac</th><th class="nr">Gia GD</th><th class="nr">Gia von</th><th class="nr">SL</th><th class="nr">Ton cuoi</th></tr>
+                    <tr><td style="color:var(--primary);cursor:pointer">HD016580</td><td style="color:var(--g500)">21/05 11:35</td><td><span style="color:var(--danger);font-weight:500">Ban hang</span></td><td>Nguyen Thi Hoa</td><td class="nr">2.350.000</td><td class="nr">1.620.000</td><td class="nr" style="color:var(--danger);font-weight:600">-1</td><td class="nr" style="font-weight:600">15</td></tr>
+                    <tr><td style="color:var(--primary);cursor:pointer">HD016341</td><td style="color:var(--g500)">09/12 15:10</td><td><span style="color:var(--danger);font-weight:500">Ban hang</span></td><td>Khach le</td><td class="nr">2.350.000</td><td class="nr">1.620.000</td><td class="nr" style="color:var(--danger);font-weight:600">-1</td><td class="nr" style="font-weight:600">16</td></tr>
+                    <tr><td style="color:var(--primary);cursor:pointer">PN000312</td><td style="color:var(--g500)">01/12 08:00</td><td><span style="color:var(--success);font-weight:500">Nhap hang</span></td><td>Adidas VN</td><td class="nr">1.620.000</td><td class="nr">1.620.000</td><td class="nr" style="color:var(--success);font-weight:600">+20</td><td class="nr" style="font-weight:600">17</td></tr>
+                    <tr><td style="color:var(--primary);cursor:pointer">TRF000088</td><td style="color:var(--g500)">28/11 14:00</td><td><span style="color:var(--warning);font-weight:500">Chuyen hang</span></td><td>CN Q1 &rarr; TT</td><td class="nr">—</td><td class="nr">1.580.000</td><td class="nr" style="color:var(--danger);font-weight:600">-5</td><td class="nr" style="font-weight:600">-3</td></tr>
+                    <tr><td style="color:var(--primary);cursor:pointer">HD015906</td><td style="color:var(--g500)">10/09 16:29</td><td><span style="color:var(--danger);font-weight:500">Ban hang</span></td><td>Tran Van Minh</td><td class="nr">2.350.000</td><td class="nr">1.580.000</td><td class="nr" style="color:var(--danger);font-weight:600">-1</td><td class="nr" style="font-weight:600">2</td></tr>
+                  </table>
+                  <div style="margin-top:8px;font-size:11.5px;color:var(--g500);display:flex;gap:16px">
+                    <span>Tong nhap: <strong style="color:var(--success)">+20</strong></span>
+                    <span>Tong xuat: <strong style="color:var(--danger)">-8</strong></span>
+                    <span>Ton cuoi: <strong>23</strong></span>
+                  </div>
+                </div>
+
+                <!-- Tab Ton kho -->
+                <div id="sp1-tonkho" class="spt" style="display:none;margin-top:10px">
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+                    <div style="background:var(--success-light);border-radius:8px;padding:10px;text-align:center">
+                      <div style="font-size:11px;color:var(--g500);margin-bottom:2px">Ton thuc te</div>
+                      <div style="font-size:20px;font-weight:700;color:var(--success)">23</div>
+                    </div>
+                    <div style="background:var(--warning-light);border-radius:8px;padding:10px;text-align:center">
+                      <div style="font-size:11px;color:var(--g500);margin-bottom:2px">KH dat chua xuat</div>
+                      <div style="font-size:20px;font-weight:700;color:var(--warning)">4</div>
+                    </div>
+                    <div style="background:var(--primary-light);border-radius:8px;padding:10px;text-align:center">
+                      <div style="font-size:11px;color:var(--g500);margin-bottom:2px">Kha dung (POS)</div>
+                      <div style="font-size:20px;font-weight:700;color:var(--primary)">19</div>
+                    </div>
+                  </div>
+                  <table style="border:1px solid var(--g200);border-radius:7px;overflow:hidden;font-size:12px;margin-bottom:12px">
+                    <tr style="background:var(--g50)"><th>Chi nhanh</th><th class="nr">Ton thuc</th><th class="nr">KH dat</th><th class="nr">Dat NCC</th><th class="nr">Kha dung</th><th>Du kien HH</th><th>Min/Max</th></tr>
+                    <tr><td style="font-weight:500">CN Quan 1</td><td class="nr" style="color:var(--success);font-weight:600">15</td><td class="nr" style="color:var(--warning)">3</td><td class="nr" style="color:var(--g400)">0</td><td class="nr" style="font-weight:600">12</td><td style="color:var(--g600)">18 ngay</td><td style="color:var(--g500)">5 / 50</td></tr>
+                    <tr><td style="font-weight:500">CN Trung tam</td><td class="nr" style="color:var(--success);font-weight:600">8</td><td class="nr" style="color:var(--warning)">1</td><td class="nr" style="color:var(--primary)">5</td><td class="nr" style="font-weight:600">7</td><td style="color:var(--g600)">22 ngay</td><td style="color:var(--g500)">3 / 30</td></tr>
+                    <tr style="background:var(--g50);font-weight:600"><td>TONG</td><td class="nr" style="color:var(--success)">23</td><td class="nr" style="color:var(--warning)">4</td><td class="nr" style="color:var(--primary)">5</td><td class="nr">19</td><td style="color:var(--g400)">—</td><td style="color:var(--g400)">—</td></tr>
+                  </table>
+                  <div style="display:flex;gap:8px">
+                    <button class="btn btn-o btn-s">+ Dat hang NCC</button>
+                    <button class="btn btn-o btn-s">Chuyen hang</button>
+                    <button class="btn btn-o btn-s">Dieu chinh ton</button>
+                  </div>
+                </div>
+
+                <!-- Tab Lien ket kenh -->
+                <div id="sp1-kenh" class="spt" style="display:none;margin-top:10px">
+                  <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+                    <div style="font-size:12px;color:var(--g500)">Ton kho tu dong dong bo 2 chieu khi ban tren kenh</div>
+                    <button class="btn btn-p btn-s">+ Lien ket kenh moi</button>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="border:1px solid var(--g200);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+                      <div style="width:36px;height:36px;background:#ee4d2d;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;flex-shrink:0">Spe</div>
+                      <div style="flex:1"><div style="font-weight:600;font-size:13px">Shopee — Shop Giay ABC</div><div style="font-size:11px;color:var(--g500)">SKU: SHOPEE_SP001234 &nbsp;|&nbsp; Gia: 2.490.000d</div></div>
+                      <div style="text-align:right"><span class="b b-green">Dang ban</span><div style="font-size:11px;color:var(--g400);margin-top:3px">Dong bo ton: &#9989;</div></div>
+                    </div>
+                    <div style="border:1px solid var(--g200);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+                      <div style="width:36px;height:36px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:11px;flex-shrink:0">TiK</div>
+                      <div style="flex:1"><div style="font-weight:600;font-size:13px">TikTok Shop — TikTok Shop Giay</div><div style="font-size:11px;color:var(--g500)">SKU: TT_SP001234 &nbsp;|&nbsp; Gia: 2.350.000d</div></div>
+                      <div style="text-align:right"><span class="b b-green">Dang ban</span><div style="font-size:11px;color:var(--g400);margin-top:3px">Dong bo ton: &#9989;</div></div>
+                    </div>
+                    <div style="border:1px solid var(--g200);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;opacity:0.6">
+                      <div style="width:36px;height:36px;background:#0f146b;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:11px;flex-shrink:0">Laz</div>
+                      <div style="flex:1"><div style="font-weight:600;font-size:13px">Lazada — Lazada Official</div><div style="font-size:11px;color:var(--g500)">SKU: LAZ_001234</div></div>
+                      <span class="b b-gray">Ngung ban</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </td></tr>
+
+            <!-- SP000978 -->
+            <tr class="cr" onclick="tog('sp2',this)">
+              <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+              <td><div style="width:32px;height:32px;background:var(--g100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">&#128095;</div></td>
+              <td><div style="font-weight:600;color:var(--primary)">SP000978</div><div style="font-size:12px">Nike Air Max 270</div><div style="font-size:11px;color:var(--g400)">4 bien the</div></td>
+              <td>Giay the thao</td><td>Cai</td><td class="nr">3.100.000</td><td class="nr">2.150.000</td>
+              <td class="nr"><span style="color:var(--success);font-weight:600">30%</span></td>
+              <td class="nr" style="color:var(--success);font-weight:600">4</td>
+              <td class="nr" style="color:var(--success);font-weight:600">12</td>
+              <td><span class="b b-green">Dang KD</span></td>
+            </tr>
+            <tr id="sp2" style="display:none"><td colspan="11" style="padding:0"><div class="dp"><p style="color:var(--g500)">Chi tiet san pham Nike Air Max 270 &#8212; SP000978</p></div></td></tr>
+
+            <!-- SP000452 -->
+            <tr class="cr" onclick="tog('sp3',this)">
+              <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+              <td><div style="width:32px;height:32px;background:var(--g100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">&#129461;</div></td>
+              <td><div style="font-weight:600;color:var(--primary)">SP000452</div><div style="font-size:12px">Tat Adidas 3 doi</div></td>
+              <td>Tat / Vo</td><td>Bo</td><td class="nr">180.000</td><td class="nr">90.000</td>
+              <td class="nr"><span style="color:var(--success);font-weight:600">50%</span></td>
+              <td class="nr" style="color:var(--warning);font-weight:600">7</td>
+              <td class="nr" style="color:var(--success);font-weight:600">38</td>
+              <td><span class="b b-green">Dang KD</span></td>
+            </tr>
+            <tr id="sp3" style="display:none"><td colspan="11" style="padding:0"><div class="dp"><p style="color:var(--g500)">Chi tiet san pham Tat Adidas 3 doi &#8212; SP000452</p></div></td></tr>
+
+            <!-- SP001100 -->
+            <tr class="cr" onclick="tog('sp4',this)">
+              <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+              <td><div style="width:32px;height:32px;background:var(--g100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">&#127950;</div></td>
+              <td><div style="font-weight:600;color:var(--primary)">SP001100</div><div style="font-size:12px">Balo Nike Elemental</div></td>
+              <td>Tui xach</td><td>Cai</td><td class="nr">850.000</td><td class="nr">530.000</td>
+              <td class="nr"><span style="color:var(--success);font-weight:600">37%</span></td>
+              <td class="nr" style="color:var(--warning);font-weight:600">3</td>
+              <td class="nr" style="color:var(--danger);font-weight:600">0</td>
+              <td><span class="b b-green">Dang KD</span></td>
+            </tr>
+            <tr id="sp4" style="display:none"><td colspan="11" style="padding:0"><div class="dp"><p style="color:var(--g500)">Chi tiet san pham Balo Nike Elemental &#8212; SP001100</p></div></td></tr>
+
+            <!-- SP000321 -->
+            <tr class="cr" onclick="tog('sp5',this)">
+              <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+              <td><div style="width:32px;height:32px;background:var(--g100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">&#128722;</div></td>
+              <td><div style="font-weight:600;color:var(--primary)">SP000321</div><div style="font-size:12px">New Balance 574 — Trang</div><div style="font-size:11px;color:var(--g400)">3 bien the</div></td>
+              <td>Giay casual</td><td>Cai</td><td class="nr">1.850.000</td><td class="nr">1.300.000</td>
+              <td class="nr"><span style="color:var(--warning);font-weight:600">29%</span></td>
+              <td class="nr" style="color:var(--danger);font-weight:600">0</td>
+              <td class="nr" style="color:var(--danger);font-weight:600">0</td>
+              <td><span class="b b-red">Het hang</span></td>
+            </tr>
+            <tr id="sp5" style="display:none"><td colspan="11" style="padding:0"><div class="dp"><p style="color:var(--g500)">Chi tiet san pham New Balance 574 &#8212; SP000321</p></div></td></tr>
+
+            <!-- SV000010 -->
+            <tr class="cr" onclick="tog('sp6',this)">
+              <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+              <td><div style="width:32px;height:32px;background:var(--g100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">&#10024;</div></td>
+              <td><div style="font-weight:600;color:var(--primary)">SV000010</div><div style="font-size:12px">Sua giay cao cap</div><div style="font-size:11px;color:var(--purple)">Dich vu</div></td>
+              <td>Dich vu</td><td>Lan</td><td class="nr">150.000</td><td class="nr">—</td>
+              <td class="nr">—</td><td class="nr" style="color:var(--g400)">—</td><td class="nr" style="color:var(--g400)">—</td>
+              <td><span class="b b-green">Dang KD</span></td>
+            </tr>
+            <tr id="sp6" style="display:none"><td colspan="11" style="padding:0"><div class="dp"><p style="color:var(--g500)">Chi tiet dich vu Sua giay cao cap &#8212; SV000010</p></div></td></tr>
+
+          </tbody>
+        </table>
+        <div style="padding:8px 12px;font-size:12px;color:var(--g500);border-top:1px solid var(--g100);display:flex;justify-content:space-between">
+          <span>Hien thi 6 / 5.510 san pham</span>
+          <span>Tong ton (CN1 + TT): <strong>37</strong> | Gia tri ton kho: <strong>87.250.000d</strong></span>
+        </div>
+      </div>
+
+    </div><!-- end two-column -->
+
+  </div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end app -->
+
+<!-- MODAL: TAO HANG HOA -->
+<div class="mo" id="mo-tao-sp">
+  <div class="mo-box" style="width:560px">
+    <div class="mo-hd"><h3>Them hang hoa moi</h3><span class="mo-x" onclick="closeMo('mo-tao-sp')">&#10005;</span></div>
+    <div class="mo-bd">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="ff"><label>Loai san pham <span style="color:var(--danger)">*</span></label>
+          <select class="fi"><option>Hang hoa thuong</option><option>Co bien the (Size/Mau)</option><option>Dich vu</option><option>Combo / Set</option></select>
+        </div>
+        <div class="ff"><label>Ma hang (tu dong neu bo trong)</label><input class="fi" type="text" placeholder="SP######"></div>
+      </div>
+      <div class="ff" style="margin-bottom:10px"><label>Ten hang hoa <span style="color:var(--danger)">*</span></label><input class="fi" type="text" placeholder="Nhap ten san pham..."></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="ff"><label>Nhom hang <span style="color:var(--danger)">*</span></label>
+          <select class="fi"><option>-- Chon nhom hang --</option><option>Giay the thao</option><option>Giay casual</option><option>Tui xach</option><option>Tat / Vo</option></select>
+        </div>
+        <div class="ff"><label>Thuong hieu</label>
+          <select class="fi"><option>-- Chon thuong hieu --</option><option>Adidas</option><option>Nike</option><option>Puma</option><option>Hang noi dia</option></select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="ff"><label>Gia ban <span style="color:var(--danger)">*</span></label><input class="fi" type="text" placeholder="0"></div>
+        <div class="ff"><label>Gia von</label><input class="fi" type="text" placeholder="0"></div>
+        <div class="ff"><label>VAT ban</label>
+          <select class="fi"><option>0%</option><option>5%</option><option>8%</option><option selected>10%</option></select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="ff"><label>Ma vach / Barcode</label><input class="fi" type="text" placeholder="Scan hoac nhap tay..."></div>
+        <div class="ff"><label>Vi tri kho</label><input class="fi" type="text" placeholder="VD: Ke A3 - Tang 2"></div>
+      </div>
+      <div style="background:var(--g50);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--g600)">
+        &#128161; Co the bo sung bien the (Size/Mau), anh, mo ta sau khi tao. Nhap hang dau vao tao Phieu Nhap hang (PN) rieng.
+      </div>
+    </div>
+    <div class="mo-ft">
+      <button class="btn btn-o" onclick="closeMo('mo-tao-sp')">Huy</button>
+      <button class="btn btn-o">Luu nhap</button>
+      <button class="btn btn-p">Luu va tiep tuc them</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(id) {
+  window.location.href = 'index.html';
+}
+function tog(id, row) {
+  const d = document.getElementById(id);
+  if (!d) return;
+  d.style.display = d.style.display === 'none' || d.style.display === '' ? 'table-row' : 'none';
+}
+function stab(e, grp, targetId) {
+  const parent = e.target.closest('.dp') || document.body;
+  parent.querySelectorAll('.' + grp).forEach(t => { t.style.display = 'none'; t.classList.remove('active'); });
+  const t = document.getElementById(targetId);
+  if (t) { t.style.display = 'block'; t.classList.add('active'); }
+  e.target.closest('.tabs').querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+}
+function openMo(id) { document.getElementById(id).classList.add('open'); }
+function closeMo(id) { document.getElementById(id).classList.remove('open'); }
+function selCat(key, el) {
+  document.querySelectorAll('.hh-cat').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+document.querySelectorAll('.mo').forEach(o => {
+  o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+});
+</script>
+</body>
+</html>

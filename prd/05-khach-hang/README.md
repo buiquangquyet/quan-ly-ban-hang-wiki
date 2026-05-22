@@ -12,6 +12,8 @@ Phân tích toàn bộ module Khách hàng của KiotViet: identity, AR (công n
 |---|---|---|
 | [01-tong-quan.md](./01-tong-quan.md) | Entity Customer, 5 tab detail, form tạo, list/filter, state machine, tích hợp module khác, pain points & cơ hội | Đọc đầu tiên — bức tranh toàn cảnh |
 | [02-nhom-va-segmentation.md](./02-nhom-va-segmentation.md) | CustomerGroup + Rule Engine (12 điều kiện, 3 mode, auto-execute), so sánh với RFM chuẩn, pain points segmentation | Hiểu cơ chế phân nhóm tự động và cơ hội nâng cấp |
+| [03-sua-thong-tin-khach-hang.md](./03-sua-thong-tin-khach-hang.md) | Screen spec: sửa thông tin KH — form 4 section, dedup phone warning, địa danh 01/07/2025, audit trail, BRs | Thiết kế màn hình sửa KH |
+| [04-gui-tin-nhan.md](./04-gui-tin-nhan.md) | Screen spec: gửi tin nhắn — ZNS/SMS/Email/Zalo OA, luồng đơn lẻ vs hàng loạt, template, opt-out, BRs | Thiết kế tính năng messaging KH |
 
 ---
 
